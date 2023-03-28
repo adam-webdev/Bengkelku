@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import React from "react";
 import { Link, useRouter, Stack } from "expo-router";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+// import ArrowLeft from "@expo/vector-icons/AntDesign";
 
 const Login = () => {
   const router = useRouter();
@@ -15,9 +17,6 @@ const Login = () => {
       {/* Use the `Screen` component to configure the layout. */}
       <Stack.Screen
         screenOptions={{
-          headerStyle: {
-            backgroundColor: "#0000a7",
-          },
           headerShown: false,
         }}
         options={{
@@ -26,6 +25,8 @@ const Login = () => {
           headerStyle: { backgroundColor: "#0000a7" },
         }}
       />
+      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+
       <View>
         <Text style={styles.font1}>Silahkan Login </Text>
       </View>
@@ -45,7 +46,7 @@ const Login = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          router.push("/Login");
+          router.push("/home/HomeScreen");
         }}
       >
         <Text
@@ -79,7 +80,6 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0000a7",
   },
@@ -122,5 +122,9 @@ const styles = StyleSheet.create({
     color: "#F05D0E",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  icon: {
+    color: "#fff",
+    marginTop: 80,
   },
 });

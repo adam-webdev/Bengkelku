@@ -27,8 +27,8 @@ const Home = () => {
           headerStyle: { backgroundColor: "#0000a7" },
         }}
       />
-      <MaterialCommunityIcons name="garage" size={32} />
-      <View>
+      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+      <View style={{ marginTop: 30 }}>
         <Text style={styles.font1}>Selamat Datang Di </Text>
         <Text style={styles.font}>Bengkelku</Text>
       </View>
@@ -58,7 +58,6 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0000a7",
   },
@@ -81,5 +80,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 30,
     borderRadius: 50,
+  },
+  icon: {
+    color: "#fff",
+    marginTop: 80,
   },
 });

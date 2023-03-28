@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { Link, useRouter, Stack } from "expo-router";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const Register = () => {
   const router = useRouter();
@@ -26,6 +27,8 @@ const Register = () => {
           headerStyle: { backgroundColor: "#0000a7" },
         }}
       />
+      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+
       <View>
         <Text style={styles.font1}>Silahkan Daftar </Text>
       </View>
@@ -84,7 +87,6 @@ export default Register;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0000a7",
   },
@@ -127,5 +129,9 @@ const styles = StyleSheet.create({
     color: "#F05D0E",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  icon: {
+    color: "#fff",
+    marginTop: 50,
   },
 });
