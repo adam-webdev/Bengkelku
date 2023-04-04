@@ -4,7 +4,15 @@ import { SafeAreaView } from "react-native";
 const Layout = () => {
   return (
     <>
-      <Stack />
+      <Stack
+        screenOptions={{
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: "#0000a7",
+          },
+          headerTintColor: "#fff",
+        }}
+      />
     </>
   );
 };
