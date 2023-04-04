@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderWidth: 2,
-    borderColor: "#0000a7",
+    borderColor: "#000",
     objectFit: "contain",
     borderRadius: 100,
   },
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#fff",
     // backgroundColor: "#0000a7",
+    cursor: "pointer",
     color: "#fff",
     flexDirection: "row",
     alignItems: "center",

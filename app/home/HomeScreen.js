@@ -8,9 +8,12 @@ import {
   TouchableHighlight,
 } from "react-native";
 import React from "react";
+import { useRouter, Link } from "expo-router";
 const Card = () => {
+  const router = useRouter();
   return (
-    <TouchableHighlight>
+    // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
+    <TouchableOpacity onPress={() => router.push("/DetailBengkel/?id=5")}>
       <View
         style={{
           backgroundColor: "#fff",
@@ -32,7 +35,7 @@ const Card = () => {
           <Text style={{ color: "grey", fontSize: 12 }}>Jarak 100 meter</Text>
         </View>
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 };
 const HomeScreen = () => {
