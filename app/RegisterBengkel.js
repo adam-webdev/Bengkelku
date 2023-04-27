@@ -12,7 +12,7 @@ import { useState } from "react";
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
-const Register = () => {
+const RegisterBengkel = () => {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,7 +39,7 @@ const Register = () => {
 
       <View style={styles.viewTitle}>
         <Text style={styles.font1}>Silahkan Daftar </Text>
-        <Text style={styles.font2}>Sebagai User Biasa </Text>
+        <Text style={styles.font2}>Sebagai User Bengkel </Text>
       </View>
       <View>
         <TextInput
@@ -132,7 +132,7 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterBengkel;
 const styles = StyleSheet.create({
   container: {
     flex: 1,

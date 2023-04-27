@@ -3,6 +3,7 @@ import Home from "@expo/vector-icons/Octicons";
 import Explore from "@expo/vector-icons/MaterialIcons";
 import Transaksi from "@expo/vector-icons/FontAwesome5";
 import UserIcon from "@expo/vector-icons/FontAwesome";
+import Color from "../constants/Color";
 export default Layout = () => {
   return (
     <>
@@ -16,14 +17,16 @@ export default Layout = () => {
             {
               height: 50,
               paddingVertical: 8,
-              activeTintColor: "#0000a7",
+              activeTintColor: Color.primary,
               inactiveTintColor: "grey",
+              tabBarActiveTintColor: "tomato",
+              tabBarInactiveTintColor: "gray",
             },
           ],
         }}
-        options={{
-          headerTitle: "",
-        }}
+        // options={{
+        //   headerTitle: "",
+        // }}
       >
         <Tabs.Screen
           name="HomeScreen"
@@ -34,6 +37,7 @@ export default Layout = () => {
             tabBarLabel: "Home",
           }}
         />
+
         <Tabs.Screen
           name="ExploreScreen"
           options={{

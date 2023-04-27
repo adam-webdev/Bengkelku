@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native";
-
+import Color from "./constants/Color";
 const Layout = () => {
   return (
     <>
@@ -8,7 +8,7 @@ const Layout = () => {
         screenOptions={{
           headerTitle: "",
           headerStyle: {
-            backgroundColor: "#0000a7",
+            backgroundColor: Color.primary,
           },
           headerTintColor: "#fff",
         }}

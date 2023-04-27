@@ -6,6 +6,7 @@ import {
   TextInput,
 } from "react-native";
 import React from "react";
+import Color from "./constants/Color";
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
@@ -60,17 +61,27 @@ const Login = () => {
           Login
         </Text>
       </TouchableOpacity>
-      <Text style={styles.linkRegister}>
-        Belum punya akun ?{" "}
+      <Text style={styles.linkRegister}>Belum punya akun ? </Text>
+      <Text style={styles.linkRegister}>Daftar sebagai : </Text>
+      <View style={styles.linkdaftar}>
+        <Text
+          onPress={() => {
+            router.push("/RegisterBengkel");
+          }}
+          style={styles.linkDaftar}
+        >
+          User Bengkel
+        </Text>
+        <Text style={styles.linkRegister}> Atau </Text>
         <Text
           onPress={() => {
             router.push("/Register");
           }}
           style={styles.linkDaftar}
         >
-          Silahkan Daftar!
+          User Biasa
         </Text>
-      </Text>
+      </View>
       {/* Use the `Link` compoSnent to enable optimized client-side routing. */}
     </View>
   );
@@ -84,23 +95,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#0000a7",
   },
   font: {
-    fontSize: 30,
+    fontSize: 26,
     color: "#F05D0E",
     fontWeight: "bold",
     marginBottom: 10,
   },
   font1: {
-    fontSize: 30,
+    fontSize: 26,
     color: "#fff",
     fontWeight: "bold",
     marginBottom: 30,
   },
   button: {
     width: 320,
-    backgroundColor: "#F05D0E",
+    backgroundColor: Color.secondaryColor,
     align: "center",
-    padding: 10,
+    padding: 8,
     marginTop: 10,
+    marginBottom: 10,
     borderRadius: 50,
   },
   input: {
@@ -116,12 +128,15 @@ const styles = StyleSheet.create({
   linkRegister: {
     fontSize: 16,
     color: "#fff",
-    marginTop: 10,
   },
   linkDaftar: {
     color: "#F05D0E",
-    fontSize: 16,
     fontWeight: "bold",
+    fontSize: 18,
+  },
+  linkdaftar: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   icon: {
     color: "#fff",

@@ -5,15 +5,25 @@ import {
   View,
   Text,
   SafeAreaView,
+  Image,
 } from "react-native";
+import { useState, useEffect } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, Stack, useRouter, SplashScreen } from "expo-router";
 
 const Home = () => {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setReady(true);
+    }, 3000);
+  });
   const router = useRouter();
   return (
     <SafeAreaView style={styles.container}>
-      {/* Use the `Screen` component to configure the layout. */}
+      {ready ? router.replace("/Login") : ""}
+      {/* Use the aScreen` component to configure the layout. */}
       <Stack.Screen
         screenOptions={{
           headerStyle: {
@@ -27,10 +37,16 @@ const Home = () => {
           headerStyle: { backgroundColor: "#0000a7" },
         }}
       />
-      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Image
+          style={styles.imagesplash}
+          source={require("../assets/banner/splash.png")}
+        />
+        <Text style={styles.font}>Bengkelku</Text>
+      </View>
+      {/* <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
       <View style={{ marginTop: 30 }}>
         <Text style={styles.font1}>Selamat Datang Di </Text>
-        <Text style={styles.font}>Bengkelku</Text>
       </View>
       <TouchableOpacity
         style={styles.button}
@@ -48,7 +64,7 @@ const Home = () => {
         >
           Mulai
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {/* Use the `Link` compoSnent to enable optimized client-side routing. */}
     </SafeAreaView>
   );
@@ -60,6 +76,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#0000a7",
+  },
+  imagesplash: {
+    width: 200,
+    height: 200,
+    borderRadius: 50,
   },
   font: {
     fontSize: 34,
