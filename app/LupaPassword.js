@@ -66,14 +66,6 @@ const LupaPassword = () => {
       </TouchableOpacity>
       <View style={styles.lupaPassword}>
         <Text>{""}</Text>
-        <Text
-          onPress={() => {
-            router.push("LupaPassword");
-          }}
-          style={{ color: "#fff", fontSize: 16, borderBottom: 1 }}
-        >
-          Lupa password ?
-        </Text>
       </View>
       <Text style={styles.linkRegister}>Belum punya akun ? </Text>
       <Text style={styles.linkRegister}>Daftar sebagai : </Text>
