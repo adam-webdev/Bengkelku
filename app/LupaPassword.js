@@ -11,19 +11,11 @@ import Color from "./constants/Color";
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
-import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
 
-const Login = () => {
+const LupaPassword = () => {
   const router = useRouter();
-  const { passwordVisibility, rightIcon, handlePasswordVisibility } =
-    useTogglePasswordVisibility();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  handleLogin = () => {
-    console.log(email);
-    console.log(password);
-  };
+  const [email, setEmail] = useState("");
   return (
     <View style={styles.container}>
       {/* Use the `Screen` component to configure the layout. */}
@@ -37,10 +29,14 @@ const Login = () => {
           headerStyle: { backgroundColor: "#0000a7" },
         }}
       />
-      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+      <MaterialCommunityIcons
+        style={styles.icon}
+        name="account-key"
+        size={110}
+      />
 
       <View>
-        <Text style={styles.font1}>Silahkan Login </Text>
+        <Text style={styles.font1}> Lupa Password </Text>
       </View>
       <View>
         <TextInput
@@ -50,35 +46,11 @@ const Login = () => {
           value={email}
           onChangeText={(text) => setEmail(text)}
         />
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholderTextColor="#fff"
-            placeholder="Konfirmasi password..."
-            secureTextEntry={passwordVisibility}
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            secureTextEntry={passwordVisibility}
-            value={password}
-            enablesReturnKeyAutomatically
-            onChangeText={(text) => setPassword(text)}
-          />
-          <Pressable onPress={handlePasswordVisibility}>
-            <MaterialCommunityIcons
-              style={styles.eyeIcon}
-              name={rightIcon}
-              size={22}
-              color="#fff"
-            />
-          </Pressable>
-        </View>
       </View>
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          handleLogin();
+          router.push("/home/HomeScreen");
         }}
       >
         <Text
@@ -89,7 +61,7 @@ const Login = () => {
             fontSize: 24,
           }}
         >
-          Login
+          Kirim
         </Text>
       </TouchableOpacity>
       <View style={styles.lupaPassword}>
@@ -129,7 +101,7 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LupaPassword;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
