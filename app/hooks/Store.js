@@ -6,16 +6,35 @@ import React, {
   createContext,
   useEffect,
 } from "react";
-import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const getData = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("userInfo");
+    return jsonValue !== null ? JSON.parse(jsonValue) : [];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const storeData = async (value) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem("userInfo", jsonValue);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const initialState = {
-  userInfo: [],
+  userInfo: getData(),
 };
 const StateContext = createContext();
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN": {
+      storeData(action.payload);
       return { ...state, userInfo: action.payload };
     }
     case "LOGOUT": {

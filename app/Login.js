@@ -6,12 +6,13 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Color from "./constants/Color";
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
+import { useStateContext } from "./hooks/Store";
 
 const Login = () => {
   const router = useRouter();
@@ -19,11 +20,35 @@ const Login = () => {
     useTogglePasswordVisibility();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { state, dispatch } = useStateContext();
+  const [loading, setLoading] = useState(false);
 
-  handleLogin = () => {
-    console.log(email);
-    console.log(password);
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://192.168.43.175:8000/api/v1/login", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const result = await response.json();
+      dispatch({ type: "LOGIN", payload: result });
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
+    // console.log(SecureStore.getItemAsync("userInfo"));
   };
+  useEffect(() => {
+    handleLogin();
+  }, []);
+  console.log(state.userInfo);
   return (
     <View style={styles.container}>
       {/* Use the `Screen` component to configure the layout. */}
@@ -48,7 +73,7 @@ const Login = () => {
           placeholderTextColor="#fff"
           placeholder="Masukan email..."
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
         />
 
         <View style={styles.inputContainer}>
@@ -63,7 +88,7 @@ const Login = () => {
             secureTextEntry={passwordVisibility}
             value={password}
             enablesReturnKeyAutomatically
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={setPassword}
           />
           <Pressable onPress={handlePasswordVisibility}>
             <MaterialCommunityIcons
@@ -77,9 +102,8 @@ const Login = () => {
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          handleLogin();
-        }}
+        onPress={() => handleLogin()}
+        disabled={loading}
       >
         <Text
           style={{
