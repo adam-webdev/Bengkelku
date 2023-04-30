@@ -10,20 +10,26 @@ export default Layout = () => {
       <Tabs
         screenOptions={{
           headerShown: false,
+          tabBarActiveTintColor: Color.primary,
+          tabBarInactiveTintColor: "grey",
           tabBarLabelStyle: {
-            fontSize: 14,
+            fontSize: 13,
           },
           tabBarStyle: [
             {
               height: 50,
-              paddingVertical: 8,
-              activeTintColor: Color.primary,
-              inactiveTintColor: "grey",
-              tabBarActiveTintColor: "tomato",
-              tabBarInactiveTintColor: "gray",
+              paddingVertical: 6,
+              display: "flex",
+              // activeTintColor: Color.secondaryColor,
+              // inactiveTintColor: "grey",
             },
+            null,
           ],
         }}
+        // tabBarOptions={{
+        //   activeTintColor: Color.primary,
+        //   inactiveTintColor: "grey",
+        // }}
         // options={{
         //   headerTitle: "",
         // }}

@@ -12,6 +12,9 @@ const Layout = () => {
             backgroundColor: Color.primary,
           },
           headerTintColor: "#fff",
+          gestureEnabled: false,
+          headerShown: true,
+          headerLeft: () => <></>,
         }}
       />
     </Store>

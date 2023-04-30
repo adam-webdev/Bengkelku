@@ -8,10 +8,10 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const getData = async () => {
+export const getUserInfo = async () => {
   try {
-    const jsonValue = await AsyncStorage.getItem("userInfo");
-    return jsonValue !== null ? JSON.parse(jsonValue) : [];
+    const userInfo = await AsyncStorage.getItem("userInfo");
+    return userInfo !== null ? JSON.parse(userInfo) : [];
   } catch (error) {
     console.log(error);
   }
@@ -20,14 +20,15 @@ export const getData = async () => {
 export const storeData = async (value) => {
   try {
     const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem("userInfo", jsonValue);
+    await AsyncStorage.setItem("userInfo", jsonValue.user);
+    await AsyncStorage.setItem("token", jsonValue.token);
   } catch (error) {
     console.log(error);
   }
 };
 
 const initialState = {
-  userInfo: getData(),
+  userInfo: getUserInfo(),
 };
 const StateContext = createContext();
 
@@ -38,6 +39,8 @@ const reducer = (state, action) => {
       return { ...state, userInfo: action.payload };
     }
     case "LOGOUT": {
+      AsyncStorage.removeItem("userInfo");
+      AsyncStorage.removeItem("token");
       return { ...state, userInfo: [] };
     }
 

@@ -25,8 +25,15 @@ const Login = () => {
   const [error, setError] = useState(false);
   const [data, setData] = useState([]);
 
+  const focusHandle = () => {
+    if (error) {
+      setError(false);
+    }
+  };
   const handleLogin = async () => {
     setLoading(true);
+    setError(false);
+
     try {
       const response = await fetch("http://192.168.43.175:8000/api/v1/login", {
         headers: {
@@ -39,20 +46,24 @@ const Login = () => {
         }),
       });
       const result = await response.json();
-      // if (result.success === false) {
-      //   setError(true);
-      //   setData(result);
-      // }
-      setData(result);
-      dispatch({ type: "LOGIN", payload: result });
+      if (result.success) {
+        console.log("hasil ", result);
+        setData(result.user);
+        dispatch({ type: "LOGIN", payload: result.token });
+        setLoading(false);
+        router.push("/home/HomeScreen");
+      }
+      console.log("error", result.message);
+      setError(true);
+      setData(result.message);
       setLoading(false);
     } catch (err) {
       setError(true);
-      console.log(err);
       setLoading(false);
     }
+
     console.log(state.userInfo);
-    console.log("data => ", data?.message?.email);
+    // console.log("data => ", data.message.email);
 
     // console.log(SecureStore.getItemAsync("userInfo"));
   };
@@ -78,7 +89,6 @@ const Login = () => {
         <Text style={styles.font1}>Silahkan Login </Text>
       </View>
       <View style={{ color: "red" }}>
-        <Text style={{ color: "red" }}>{data.data?.message?.email}</Text>
         {/* <Text style={styles.textError}>
           { data.data?.message.password : ""}
         </Text>
@@ -86,15 +96,25 @@ const Login = () => {
       </View>
       <View>
         <TextInput
+          onFocus={() => focusHandle()}
           style={styles.input}
           placeholderTextColor="#fff"
           placeholder="Masukan email..."
           value={email}
           onChangeText={(text) => setEmail(text)}
         />
-
+        {error ? (
+          data?.email ? (
+            <Text style={styles.textError}>{data?.email}</Text>
+          ) : (
+            <Text style={styles.textError}>{data}</Text>
+          )
+        ) : (
+          ""
+        )}
         <View style={styles.inputContainer}>
           <TextInput
+            onFocus={() => focusHandle()}
             style={styles.input}
             placeholderTextColor="#fff"
             placeholder="Masukan password..."
@@ -116,6 +136,7 @@ const Login = () => {
             />
           </Pressable>
         </View>
+        {error ? <Text style={styles.textError}>{data?.password}</Text> : ""}
       </View>
       <TouchableOpacity
         style={styles.button}
@@ -220,9 +241,10 @@ const styles = StyleSheet.create({
   input: {
     width: 320,
     color: "#fff",
-    margin: 14,
+    marginBottom: 10,
+    marginTop: 10,
     fontSize: 18,
-    borderColor: "#fff",
+    borderColor: "white",
     borderWidth: 1,
     padding: 12,
     borderRadius: 50,
@@ -245,7 +267,9 @@ const styles = StyleSheet.create({
     marginTop: 80,
   },
   textError: {
-    fontSize: 18,
-    color: "#fff",
+    fontSize: 16,
+    color: Color.secondaryColor,
+    marginLeft: 20,
+    marginTop: -10,
   },
 });
