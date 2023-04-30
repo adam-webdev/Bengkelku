@@ -12,7 +12,7 @@ import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, storeData } from "./hooks/Store";
 
 const Login = () => {
   const router = useRouter();
@@ -22,6 +22,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { state, dispatch } = useStateContext();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState([]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -37,18 +39,26 @@ const Login = () => {
         }),
       });
       const result = await response.json();
+      // if (result.success === false) {
+      //   setError(true);
+      //   setData(result);
+      // }
+      setData(result);
       dispatch({ type: "LOGIN", payload: result });
       setLoading(false);
     } catch (err) {
+      setError(true);
       console.log(err);
       setLoading(false);
     }
+    console.log(state.userInfo);
+    console.log("data => ", data?.message?.email);
+
     // console.log(SecureStore.getItemAsync("userInfo"));
   };
-  useEffect(() => {
-    handleLogin();
-  }, []);
-  console.log(state.userInfo);
+  // useEffect(() => {
+  //   handleLogin();
+  // }, []);
   return (
     <View style={styles.container}>
       {/* Use the `Screen` component to configure the layout. */}
@@ -67,20 +77,27 @@ const Login = () => {
       <View>
         <Text style={styles.font1}>Silahkan Login </Text>
       </View>
+      <View style={{ color: "red" }}>
+        <Text style={{ color: "red" }}>{data.data?.message?.email}</Text>
+        {/* <Text style={styles.textError}>
+          { data.data?.message.password : ""}
+        </Text>
+        <Text style={styles.textError}>{error ? data.data?.message : ""}</Text> */}
+      </View>
       <View>
         <TextInput
           style={styles.input}
           placeholderTextColor="#fff"
           placeholder="Masukan email..."
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => setEmail(text)}
         />
 
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholderTextColor="#fff"
-            placeholder="Konfirmasi password..."
+            placeholder="Masukan password..."
             secureTextEntry={passwordVisibility}
             autoCapitalize="none"
             autoCorrect={false}
@@ -88,7 +105,7 @@ const Login = () => {
             secureTextEntry={passwordVisibility}
             value={password}
             enablesReturnKeyAutomatically
-            onChangeText={setPassword}
+            onChangeText={(text) => setPassword(text)}
           />
           <Pressable onPress={handlePasswordVisibility}>
             <MaterialCommunityIcons
@@ -122,7 +139,7 @@ const Login = () => {
           onPress={() => {
             router.push("LupaPassword");
           }}
-          style={{ color: "#fff", fontSize: 16, borderBottom: 1 }}
+          style={{ color: "#fff", fontSize: 16 }}
         >
           Lupa password ?
         </Text>
@@ -226,5 +243,9 @@ const styles = StyleSheet.create({
   icon: {
     color: "#fff",
     marginTop: 80,
+  },
+  textError: {
+    fontSize: 18,
+    color: "#fff",
   },
 });
