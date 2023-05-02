@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   Pressable,
+  ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Color from "./constants/Color";
@@ -49,14 +50,15 @@ const Login = () => {
       if (result.success) {
         console.log("hasil ", result);
         setData(result.user);
-        dispatch({ type: "LOGIN", payload: result.token });
+        dispatch({ type: "LOGIN", payload: result.data });
         setLoading(false);
         router.push("/home/HomeScreen");
+      } else {
+        console.log("error", result.message);
+        setError(true);
+        setData(result.message);
+        setLoading(false);
       }
-      console.log("error", result.message);
-      setError(true);
-      setData(result.message);
-      setLoading(false);
     } catch (err) {
       setError(true);
       setLoading(false);
@@ -71,128 +73,135 @@ const Login = () => {
   //   handleLogin();
   // }, []);
   return (
-    <View style={styles.container}>
-      {/* Use the `Screen` component to configure the layout. */}
-      <Stack.Screen
-        screenOptions={{
-          headerShown: false,
-        }}
-        options={{
-          headerTitle: "",
-          headerShadowVisible: false,
-          headerStyle: { backgroundColor: "#0000a7" },
-        }}
-      />
-      <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
+    <ScrollView style={styles.wrapper}>
+      <View style={styles.container}>
+        {/* Use the `Screen` component to configure the layout. */}
+        <Stack.Screen
+          screenOptions={{
+            headerShown: false,
+          }}
+          options={{
+            headerTitle: "",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: "#0000a7" },
+          }}
+        />
+        <MaterialCommunityIcons style={styles.icon} name="garage" size={150} />
 
-      <View>
-        <Text style={styles.font1}>Silahkan Login </Text>
-      </View>
-      <View style={{ color: "red" }}>
-        {/* <Text style={styles.textError}>
+        <View>
+          <Text style={styles.font1}>Silahkan Login </Text>
+        </View>
+        <View style={{ color: "red" }}>
+          {/* <Text style={styles.textError}>
           { data.data?.message.password : ""}
         </Text>
         <Text style={styles.textError}>{error ? data.data?.message : ""}</Text> */}
-      </View>
-      <View>
-        <TextInput
-          onFocus={() => focusHandle()}
-          style={styles.input}
-          placeholderTextColor="#fff"
-          placeholder="Masukan email..."
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-        {error ? (
-          data?.email ? (
-            <Text style={styles.textError}>{data?.email}</Text>
-          ) : (
-            <Text style={styles.textError}>{data}</Text>
-          )
-        ) : (
-          ""
-        )}
-        <View style={styles.inputContainer}>
+        </View>
+        <View>
           <TextInput
             onFocus={() => focusHandle()}
             style={styles.input}
             placeholderTextColor="#fff"
-            placeholder="Masukan password..."
-            secureTextEntry={passwordVisibility}
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="newPassword"
-            secureTextEntry={passwordVisibility}
-            value={password}
-            enablesReturnKeyAutomatically
-            onChangeText={(text) => setPassword(text)}
+            placeholder="Masukan email..."
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
-          <Pressable onPress={handlePasswordVisibility}>
-            <MaterialCommunityIcons
-              style={styles.eyeIcon}
-              name={rightIcon}
-              size={22}
-              color="#fff"
+          {error ? (
+            data?.email ? (
+              <Text style={styles.textError}>{data?.email}</Text>
+            ) : (
+              <Text style={styles.textError}>{data}</Text>
+            )
+          ) : (
+            ""
+          )}
+          <View style={styles.inputContainer}>
+            <TextInput
+              onFocus={() => focusHandle()}
+              style={styles.input}
+              placeholderTextColor="#fff"
+              placeholder="Masukan password..."
+              secureTextEntry={passwordVisibility}
+              autoCapitalize="none"
+              autoCorrect={false}
+              textContentType="newPassword"
+              secureTextEntry={passwordVisibility}
+              value={password}
+              enablesReturnKeyAutomatically
+              onChangeText={(text) => setPassword(text)}
             />
-          </Pressable>
+            <Pressable onPress={handlePasswordVisibility}>
+              <MaterialCommunityIcons
+                style={styles.eyeIcon}
+                name={rightIcon}
+                size={22}
+                color="#fff"
+              />
+            </Pressable>
+          </View>
+          {error ? <Text style={styles.textError}>{data?.password}</Text> : ""}
         </View>
-        {error ? <Text style={styles.textError}>{data?.password}</Text> : ""}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleLogin()}
+          disabled={loading}
+        >
+          <Text
+            style={{
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#fff",
+              fontSize: 24,
+            }}
+          >
+            Login
+          </Text>
+        </TouchableOpacity>
+        <View style={styles.lupaPassword}>
+          <Text>{""}</Text>
+          <Text
+            onPress={() => {
+              router.push("LupaPassword");
+            }}
+            style={{ color: "#fff", fontSize: 16 }}
+          >
+            Lupa password ?
+          </Text>
+        </View>
+        <Text style={styles.linkRegister}>Belum punya akun ? </Text>
+        <Text style={styles.linkRegister}>Daftar sebagai : </Text>
+        <View style={styles.linkdaftar}>
+          <Text
+            onPress={() => {
+              router.push("/RegisterBengkel");
+            }}
+            style={styles.linkDaftar}
+          >
+            User Bengkel
+          </Text>
+          <Text style={styles.linkRegister}> Atau </Text>
+          <Text
+            onPress={() => {
+              router.push("/Register");
+            }}
+            style={styles.linkDaftar}
+          >
+            User Biasa
+          </Text>
+        </View>
+        {/* Use the `Link` compoSnent to enable optimized client-side routing. */}
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleLogin()}
-        disabled={loading}
-      >
-        <Text
-          style={{
-            fontWeight: "bold",
-            textAlign: "center",
-            color: "#fff",
-            fontSize: 24,
-          }}
-        >
-          Login
-        </Text>
-      </TouchableOpacity>
-      <View style={styles.lupaPassword}>
-        <Text>{""}</Text>
-        <Text
-          onPress={() => {
-            router.push("LupaPassword");
-          }}
-          style={{ color: "#fff", fontSize: 16 }}
-        >
-          Lupa password ?
-        </Text>
-      </View>
-      <Text style={styles.linkRegister}>Belum punya akun ? </Text>
-      <Text style={styles.linkRegister}>Daftar sebagai : </Text>
-      <View style={styles.linkdaftar}>
-        <Text
-          onPress={() => {
-            router.push("/RegisterBengkel");
-          }}
-          style={styles.linkDaftar}
-        >
-          User Bengkel
-        </Text>
-        <Text style={styles.linkRegister}> Atau </Text>
-        <Text
-          onPress={() => {
-            router.push("/Register");
-          }}
-          style={styles.linkDaftar}
-        >
-          User Biasa
-        </Text>
-      </View>
-      {/* Use the `Link` compoSnent to enable optimized client-side routing. */}
-    </View>
+    </ScrollView>
   );
 };
 
 export default Login;
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    height: 100,
+    backgroundColor: "#0000a7",
+  },
   container: {
     flex: 1,
     alignItems: "center",

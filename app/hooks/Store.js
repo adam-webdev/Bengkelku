@@ -16,6 +16,14 @@ export const getUserInfo = async () => {
     console.log(error);
   }
 };
+export const getUserToken = async () => {
+  try {
+    const userToken = await AsyncStorage.getItem("token");
+    return userToken !== null ? JSON.parse(userToken) : "";
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const storeData = async (value) => {
   try {
@@ -29,6 +37,7 @@ export const storeData = async (value) => {
 
 const initialState = {
   userInfo: getUserInfo(),
+  userToken: getUserToken(),
 };
 const StateContext = createContext();
 

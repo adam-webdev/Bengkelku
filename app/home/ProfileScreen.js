@@ -6,22 +6,34 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { useStateContext, storeData } from "../hooks/Store";
+
 import Octicons from "@expo/vector-icons/Octicons";
 
 import React from "react";
 
 const ProfileScreen = () => {
+  const { state, dispatch } = useStateContext();
+  // console.log("test", state.userInfo);
   return (
     <>
       <View style={styles.container}>
         <View style={styles.box}>
-          <Image
-            style={styles.images}
-            source={require("../../assets/img/adam2.png")}
-          />
-          <Text style={styles.name}>Adam dwi maulana</Text>
-          <Text>adamdwi@gmail.com</Text>
-          <Text>Bekasi</Text>
+          {state?.userInfo?.user?.foto ? (
+            <Image
+              style={styles.images}
+              source={{ uri: state?.userInfo?.user?.foto }}
+            />
+          ) : (
+            <Image
+              style={styles.images}
+              source={require("../../assets/img/adam2.png")}
+            />
+          )}
+
+          <Text style={styles.name}>{state?.userInfo?.user?.name}</Text>
+          <Text style={{ fontSize: 18 }}>{state?.userInfo?.user?.email}</Text>
+          <Text style={{ fontSize: 15 }}>Bekasi</Text>
         </View>
       </View>
       <View style={{ margin: 10 }}>
@@ -85,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   name: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
   button: {

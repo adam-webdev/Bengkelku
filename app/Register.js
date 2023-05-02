@@ -6,24 +6,29 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import { useState, Redirect } from "react";
 // import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Color from "./constants/Color";
 
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
+import { useStateContext, storeData } from "./hooks/Store";
+
 const Register = () => {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [nohp, setNohp] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { state, dispatch } = useStateContext();
+  // const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [user, setUser] = useState(false);
+  const [data, setData] = useState({});
+  // const [pwConfirm, setPwConfirm] = useState("");
 
   const { passwordVisibility, rightIcon, handlePasswordVisibility } =
     useTogglePasswordVisibility();
@@ -31,7 +36,12 @@ const Register = () => {
 
   const handleRegister = async () => {
     setError(false);
+    // setPwConfirm("");
     setLoading(true);
+    // if (password !== confirmPassword) {
+    //   setPwConfirm("Konfirmasi password beda!");
+    //   return;
+    // }
     try {
       const response = await fetch(
         "http://192.168.43.175:8000/api/v1/register",
@@ -45,27 +55,39 @@ const Register = () => {
             email,
             no_hp: nohp,
             password,
-            confirm_password: confirmPassword,
+            // confirm_password: confirmPassword,
           }),
         }
       );
       const result = await response.json();
-      if (result.success) {
+      if (result?.success) {
         console.log("hasil ", result);
-        setUser(result.user);
-        dispatch({ type: "LOGIN", payload: result.token });
+        setData(result.data.user);
+        dispatch({ type: "LOGIN", payload: result?.data });
         setLoading(false);
-        router.push("/home/HomeScreen");
+        router.replace("/home/HomeScreen");
+      } else {
+        console.log("error result", result.message);
+        setError(true);
+        setData(result?.message);
+        setLoading(false);
       }
-      console.log("error", result.message);
-      setError(true);
-      setUser(result.message);
-      setLoading(false);
     } catch (err) {
-      setError(true);
+      // setError(true);
       setLoading(false);
     }
   };
+  // console.log("user info", user);
+  if (loading) {
+    return (
+      <ActivityIndicator
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        size="large"
+        color={Color.primary}
+      />
+    );
+  }
+  // console.log("user", getUserInfo());
   return (
     <ScrollView style={styles.wrapper}>
       <View style={styles.container}>
@@ -98,8 +120,8 @@ const Register = () => {
             onChangeText={(text) => setName(text)}
           />
           {error ? (
-            user?.name ? (
-              <Text style={styles.textError}>{user?.name}</Text>
+            data?.name ? (
+              <Text style={styles.textError}>{data?.name}</Text>
             ) : (
               ""
             )
@@ -114,10 +136,10 @@ const Register = () => {
             onChangeText={(text) => setEmail(text)}
           />
           {error ? (
-            user?.email ? (
-              <Text style={styles.textError}>{user?.email}</Text>
+            data?.email ? (
+              <Text style={styles.textError}>{data?.email}</Text>
             ) : (
-              <Text style={styles.textError}>{user}</Text>
+              <Text style={styles.textError}>{data}</Text>
             )
           ) : (
             ""
@@ -129,8 +151,17 @@ const Register = () => {
             value={nohp}
             onChangeText={(text) => setNohp(text)}
             keyboardType="numeric"
+            minLength={11}
           />
-          {error ? <Text style={styles.textError}>{user?.no_hp}</Text> : ""}
+          {error ? (
+            data?.no_hp ? (
+              <Text style={styles.textError}>{data?.no_hp}</Text>
+            ) : (
+              ""
+            )
+          ) : (
+            ""
+          )}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -154,16 +185,10 @@ const Register = () => {
               />
             </Pressable>
           </View>
-          {error ? (
-            user?.password ? (
-              <Text style={styles.textError}>{user?.password}</Text>
-            ) : (
-              <Text style={styles.textError}>{user}</Text>
-            )
-          ) : (
-            ""
-          )}
-          <View style={styles.inputContainer}>
+          {/* {console.log("data test ===>", data)} */}
+          {error ? <Text style={styles.textError}>{data?.password}</Text> : ""}
+
+          {/* <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               placeholderTextColor="#fff"
@@ -186,15 +211,11 @@ const Register = () => {
               />
             </Pressable>
           </View>
-          {error ? (
-            user?.confirm_password ? (
-              <Text style={styles.textError}>{user?.confirm_password}</Text>
-            ) : (
-              <Text style={styles.textError}>{user}</Text>
-            )
+          {data?.confirmPassword ? (
+            <Text style={styles.textError}>{data?.confirmPassword}</Text>
           ) : (
             ""
-          )}
+          )} */}
         </View>
         <TouchableOpacity
           style={styles.button}
