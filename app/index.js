@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Link, Stack, useRouter, SplashScreen } from "expo-router";
-
+import { useStateContext } from "./hooks/Store";
 const Home = () => {
   const [ready, setReady] = useState(false);
 
@@ -20,9 +20,15 @@ const Home = () => {
     }, 3000);
   });
   const router = useRouter();
+  const { state } = useStateContext();
+  // console.log("state", state?.userInfo._j.user.name);
   return (
     <SafeAreaView style={styles.container}>
-      {ready ? router.replace("/Login") : ""}
+      {ready
+        ? state?.userInfo._j.user.name
+          ? router.replace("/home/HomeScreen")
+          : router.replace("/Login")
+        : ""}
       {/* Use the aScreen` component to configure the layout. */}
       <Stack.Screen
         screenOptions={{

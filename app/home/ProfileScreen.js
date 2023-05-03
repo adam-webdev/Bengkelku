@@ -9,10 +9,11 @@ import {
 import { useStateContext, storeData } from "../hooks/Store";
 
 import Octicons from "@expo/vector-icons/Octicons";
-
+import { useRouter } from "expo-router";
 import React from "react";
 
 const ProfileScreen = () => {
+  const router = useRouter();
   const { state, dispatch } = useStateContext();
   // console.log("test", state.userInfo);
   return (
@@ -37,7 +38,10 @@ const ProfileScreen = () => {
         </View>
       </View>
       <View style={{ margin: 10 }}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/EditProfile")}
+        >
           <Text style={{ textAlign: "center", color: "#000", fontSize: 18 }}>
             Edit Profile
           </Text>
