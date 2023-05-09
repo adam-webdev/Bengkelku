@@ -11,33 +11,52 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const getUserInfo = async () => {
   try {
     const userInfo = await AsyncStorage.getItem("userInfo");
-    return userInfo !== null ? JSON.parse(userInfo) : [];
+    console.log("getUserInfo", userInfo);
+    return userInfo !== null ? JSON.parse(userInfo) : null;
   } catch (error) {
-    console.log(error);
+    if (error instanceof SyntaxError) {
+      console.error("Invalid JSON:", error.message);
+    } else {
+      throw error;
+    }
   }
 };
-export const getUserToken = async () => {
-  try {
-    const userToken = await AsyncStorage.getItem("token");
-    return userToken !== null ? JSON.parse(userToken) : "";
-  } catch (error) {
-    console.log(error);
-  }
-};
+// export const getUserToken = async () => {
+//   try {
+//     const userToken = await AsyncStorage.getItem("token");
+//     return userToken !== "" ? userToken : "";
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 export const storeData = async (value) => {
   try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem("userInfo", jsonValue.user);
-    await AsyncStorage.setItem("token", jsonValue.token);
+    // const jsonValue = JSON.stringify(value);
+    console.log("json val = ", value);
+    console.log("json val user = ", value.user);
+    await AsyncStorage.setItem("userInfo", JSON.stringify(value));
+    // await AsyncStorage.setItem("token", value.token);
   } catch (error) {
-    console.log(error);
+    if (error instanceof SyntaxError) {
+      console.error("Invalid JSON:", error.message);
+    } else {
+      throw error;
+    }
+  }
+};
+
+const deleteUserInfo = async () => {
+  try {
+    await AsyncStorage.removeItem("userInfo");
+  } catch (err) {
+    console.log(err);
   }
 };
 
 const initialState = {
   userInfo: getUserInfo(),
-  userToken: getUserToken(),
+  // userToken: getUserToken(),
 };
 const StateContext = createContext();
 
@@ -48,8 +67,8 @@ const reducer = (state, action) => {
       return { ...state, userInfo: action.payload };
     }
     case "LOGOUT": {
-      AsyncStorage.removeItem("userInfo");
-      AsyncStorage.removeItem("token");
+      deleteUserInfo();
+      // AsyncStorage.removeItem("userInfo");
       return { ...state, userInfo: [] };
     }
 

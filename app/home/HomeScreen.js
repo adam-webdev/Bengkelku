@@ -8,11 +8,14 @@ import {
   TouchableHighlight,
   ActivityIndicator,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import { useRouter, Link } from "expo-router";
 import { useStateContext, getUserInfo } from "./../hooks/Store";
 import Color from "../constants/Color";
 import { AsyncStorage } from "@react-native-async-storage/async-storage";
+import * as Location from "expo-location";
+
 import useDaerah from "./../hooks/useDaerah";
 const Card = ({ item }) => {
   const router = useRouter();
@@ -22,21 +25,35 @@ const Card = ({ item }) => {
   const desa = useDaerah(item.desa_id, "desa");
   return (
     // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
-    <TouchableOpacity onPress={() => router.push("/DetailBengkel/?id=5")}>
+    <TouchableOpacity
+      onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
+    >
       <View
         style={{
           backgroundColor: "#fff",
           padding: 10,
           flexDirection: "row",
-          gap: 5,
+          gap: 10,
           alignItems: "center",
+          borderRadius: 10,
+          // borderWidth: 1,
+          // borderColor: "grey",
         }}
       >
-        <Image
-          style={{ width: 100, height: 100 }}
-          source={require("../../assets/banner/banner.png")}
-        />
-        <View style={{ gap: 5 }}>
+        {item?.foto_bengkel ? (
+          <Image
+            style={styles.imageBanner}
+            resizeMode="cover"
+            source={{ uri: item?.foto_bengkel }}
+          />
+        ) : (
+          <Image
+            style={styles.imageBanner}
+            resizeMode="cover"
+            source={require("../../assets/banner/banner.png")}
+          />
+        )}
+        <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 16, fontWeight: "bold" }}>
             {item.nama_bengkel}
           </Text>
@@ -54,6 +71,7 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
+  const [location, setLocation] = useState();
 
   const getDataBengkel = async () => {
     setLoading(true);
@@ -64,7 +82,7 @@ const HomeScreen = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?._j.token,
+            Authorization: "Bearer " + state?.userInfo.token,
           },
         }
       );
@@ -76,9 +94,32 @@ const HomeScreen = () => {
       console.log(err);
     }
   };
+
   useEffect(() => {
     getDataBengkel();
   }, []);
+
+  const getPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    console.log("status", status);
+    if (status !== "granted") {
+      console.log("Silahkan aktifkan gps");
+      return;
+    } else {
+      let currentLocation = await Location.getCurrentPositionAsync();
+      setLocation(currentLocation);
+      console.log("lokasi anda :");
+      console.log("lokasi", currentLocation);
+    }
+  };
+
+  useEffect(() => {
+    getPermission();
+  }, []);
+  console.log("lokasi", location);
+
+  console.log("home =>", state?.userInfo);
+  // console.log(state?.user);
   if (loading) {
     return (
       <ActivityIndicator
@@ -91,10 +132,13 @@ const HomeScreen = () => {
   // const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
     <ScrollView>
+      <StatusBar />
       <View style={styles.banner}>
         <Text style={styles.judul}>
           Selamat Datang{" "}
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>Adam</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+            {state?.userInfo?.user?.name}
+          </Text>
         </Text>
         <Image
           style={styles.imageBanner}
@@ -136,9 +180,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   imageBanner: {
-    width: 400,
-    objectFit: "contain",
-    height: 200,
+    width: 100,
+    objectFit: "cover",
+    height: 100,
+    borderRadius: 10,
   },
   button: {
     justifyContent: "center",

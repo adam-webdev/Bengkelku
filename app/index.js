@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Link, Stack, useRouter, SplashScreen } from "expo-router";
 import { useStateContext } from "./hooks/Store";
+import Color from "./constants/Color";
 const Home = () => {
   const [ready, setReady] = useState(false);
 
@@ -25,7 +26,7 @@ const Home = () => {
   return (
     <SafeAreaView style={styles.container}>
       {ready
-        ? state?.userInfo._j.user.name
+        ? state?.userInfo
           ? router.replace("/home/HomeScreen")
           : router.replace("/Login")
         : ""}
@@ -33,12 +34,13 @@ const Home = () => {
       <Stack.Screen
         screenOptions={{
           headerStyle: {
-            backgroundColor: "#0000a7",
+            backgroundColor: Color.primary,
           },
-          headerShown: false,
+          headerTitle: "Home",
+          headerShown: true,
         }}
         options={{
-          headerTitle: "",
+          // headerTitle: "",
           headerShadowVisible: false,
           headerStyle: { backgroundColor: "#0000a7" },
         }}

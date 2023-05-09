@@ -5,6 +5,7 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useStateContext, storeData } from "../hooks/Store";
 
@@ -16,6 +17,36 @@ const ProfileScreen = () => {
   const router = useRouter();
   const { state, dispatch } = useStateContext();
   // console.log("test", state.userInfo);
+
+  const handleLogout = () => {
+    showAlert();
+  };
+
+  const showAlert = () =>
+    Alert.alert(
+      "Logout",
+      "Anda yakin ingin keluar ?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => Alert.alert("Cancel"),
+          style: "cancel",
+        },
+        {
+          text: "Iya",
+          onPress: () => {
+            dispatch({ type: "LOGOUT", payload: "" }), router.replace("/Login");
+          },
+        },
+      ]
+      // {
+      //   text: "iya",
+      //   onDismiss: () =>
+      //     Alert.alert(
+      //       "This alert was dismissed by tapping outside of the alert dialog."
+      //     ),
+      // }
+    );
   return (
     <>
       <View style={styles.container}>
@@ -63,7 +94,7 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={{ margin: 10 }}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => handleLogout()}>
           <Text style={{ textAlign: "center", color: "red", fontSize: 18 }}>
             Keluar
           </Text>

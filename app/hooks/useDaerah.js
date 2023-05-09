@@ -17,7 +17,7 @@ const useDaerah = (id, name) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo._j.token,
+            Authorization: "Bearer " + state?.userInfo.token,
           },
           body: JSON.stringify({
             id: id,

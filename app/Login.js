@@ -7,6 +7,8 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import React, { useState, useEffect } from "react";
 import Color from "./constants/Color";
 import { Link, useRouter, Stack } from "expo-router";
@@ -48,11 +50,17 @@ const Login = () => {
       });
       const result = await response.json();
       if (result.success) {
-        console.log("hasil ", result);
-        setData(result.user);
+        console.log("hasil ==> ", result);
+        setData(result.data.user);
+        // const value = JSON.stringify(result);
+        // AsyncStorage.removeItem("userInfo");
+        // AsyncStorage.removeItem("token");
+        // AsyncStorage.setItem("userInfo", value.user);
+        // AsyncStorage.setItem("token", value.token);
+        // console.log("valueeee", value);
         dispatch({ type: "LOGIN", payload: result.data });
         setLoading(false);
-        router.push("/home/HomeScreen");
+        router.replace("/home/HomeScreen");
       } else {
         console.log("error", result.message);
         setError(true);
@@ -64,7 +72,7 @@ const Login = () => {
       setLoading(false);
     }
 
-    console.log(state.userInfo);
+    // console.log(state?.userInfo);
     // console.log("data => ", data.message.email);
 
     // console.log(SecureStore.getItemAsync("userInfo"));
@@ -189,6 +197,7 @@ const Login = () => {
             User Biasa
           </Text>
         </View>
+
         {/* Use the `Link` compoSnent to enable optimized client-side routing. */}
       </View>
     </ScrollView>
