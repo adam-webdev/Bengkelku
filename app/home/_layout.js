@@ -4,7 +4,22 @@ import Explore from "@expo/vector-icons/MaterialIcons";
 import Transaksi from "@expo/vector-icons/FontAwesome5";
 import UserIcon from "@expo/vector-icons/FontAwesome";
 import Color from "../constants/Color";
+import { useStateContext, getUserInfo } from "./../hooks/Store";
+import { useEffect } from "react";
 export default Layout = () => {
+  const { state, dispatch } = useStateContext();
+  // const checkLogin = async () => {
+  //   const data = await getUserInfo();
+  //   console.log("layout", data);
+  //   if (data === null) {
+  //     router.push("/Login");
+  //   } else {
+  //     dispatch({ type: "LOGIN", payload: data });
+  //   }
+  // };
+  // useEffect(() => {
+  //   checkLogin();
+  // }, []);
   return (
     <>
       <Tabs

@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useStateContext } from "./Store";
+import { AsyncStorage } from "@react-native-async-storage/async-storage";
 
 const useDaerah = (id, name) => {
   const [data, setData] = useState([]);
@@ -9,6 +10,9 @@ const useDaerah = (id, name) => {
   const { state } = useStateContext();
 
   const fetchDaerah = async () => {
+    // const token = state?.userInfo
+    //   ? state?.userInfo?._j?.token
+    //   : state?.userInfo?.user?.token;
     setLoading(true);
     try {
       const res = await fetch(

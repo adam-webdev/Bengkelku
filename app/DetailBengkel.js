@@ -8,6 +8,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Foundation from "@expo/vector-icons/Foundation";
 import IonIcons from "@expo/vector-icons/Ionicons";
 import useDaerah from "./hooks/useDaerah";
+import useToken from "./hooks/useToken";
 
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
@@ -15,6 +16,7 @@ const DetailBengkel = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
+  const token = useToken();
 
   const getDetailBengkel = async () => {
     setLoading(true);
@@ -25,7 +27,7 @@ const DetailBengkel = ({ navigation }) => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?._j.token,
+            Authorization: "Bearer " + token,
           },
         }
       );

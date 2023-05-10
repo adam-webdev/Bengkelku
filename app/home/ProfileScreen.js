@@ -12,6 +12,7 @@ import { useStateContext, storeData } from "../hooks/Store";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useRouter } from "expo-router";
 import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -34,8 +35,10 @@ const ProfileScreen = () => {
         },
         {
           text: "Iya",
-          onPress: () => {
-            dispatch({ type: "LOGOUT", payload: "" }), router.replace("/Login");
+          onPress: async () => {
+            await AsyncStorage.removeItem("userInfo");
+            dispatch({ type: "LOGOUT" });
+            router.replace("/Login");
           },
         },
       ]
@@ -54,7 +57,7 @@ const ProfileScreen = () => {
           {state?.userInfo?.user?.foto ? (
             <Image
               style={styles.images}
-              source={{ uri: state?.userInfo?.user?.foto }}
+              source={{ uri: state?.userInfo?._j?.user?.foto }}
             />
           ) : (
             <Image
@@ -63,7 +66,7 @@ const ProfileScreen = () => {
             />
           )}
 
-          <Text style={styles.name}>{state?.userInfo?.user?.name}</Text>
+          <Text style={styles.name}>{state?.userInfo?._j?.user?.name}</Text>
           <Text style={{ fontSize: 18 }}>{state?.userInfo?.user?.email}</Text>
           <Text style={{ fontSize: 15 }}>Bekasi</Text>
         </View>

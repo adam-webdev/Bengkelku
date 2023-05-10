@@ -11,12 +11,13 @@ import {
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import { useRouter, Link } from "expo-router";
-import { useStateContext, getUserInfo } from "./../hooks/Store";
+import { useStateContext, getUserInfo, getUserToken } from "./../hooks/Store";
 import Color from "../constants/Color";
 import { AsyncStorage } from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 
 import useDaerah from "./../hooks/useDaerah";
+import useToken from "./../hooks/useToken";
 const Card = ({ item }) => {
   const router = useRouter();
   const provinsi = useDaerah(item.provinsi_id, "provinsi");
@@ -70,10 +71,24 @@ const HomeScreen = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const { state } = useStateContext();
-  const [location, setLocation] = useState();
+  const { state, dispatch } = useStateContext();
+  const [location, setLocation] = useState("");
+  const router = useRouter();
+  // const token = useToken();
 
+  // const checkLogin = async () => {
+  //   const data = await getUserInfo();
+  //   if (data) {
+  //     dispatch({ type: "LOGIN", payload: data });
+  //   } else {
+  //     router.replace("/Login");
+  //   }
+  // };
+  // useEffect(() => {
+  //   checkLogin();
+  // }, []);
   const getDataBengkel = async () => {
+    // console.log("token", token);
     setLoading(true);
     try {
       const response = await fetch(
@@ -82,7 +97,7 @@ const HomeScreen = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo.token,
+            Authorization: "Bearer " + state?.userInfo?.token,
           },
         }
       );
@@ -99,25 +114,34 @@ const HomeScreen = () => {
     getDataBengkel();
   }, []);
 
-  const getPermission = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    console.log("status", status);
-    if (status !== "granted") {
-      console.log("Silahkan aktifkan gps");
-      return;
-    } else {
-      let currentLocation = await Location.getCurrentPositionAsync();
-      setLocation(currentLocation);
-      console.log("lokasi anda :");
-      console.log("lokasi", currentLocation);
-    }
-  };
-
   useEffect(() => {
-    getPermission();
-  }, []);
-  console.log("lokasi", location);
+    const getPermissionLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      console.log("status", status);
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+      // console.log("getting location", location);
+      // let currentLocation = await Location.getCurrentPositionAsync();
+      // console.log("current", currentLocation);
+      // setLocation(currentLocation);
+      try {
+        var curlocation = await Location.getCurrentPositionAsync({});
+      } catch {
+        curlocation = await Location.getCurrentPositionAsync({});
+      }
+      console.log(curlocation);
+    };
+    const { coords } = curlocation;
 
+    if (coords) {
+      const { latitude, longitude } = coords;
+    }
+    getPermissionLocation();
+  }, []);
+
+  console.log("lokasi", location);
   console.log("home =>", state?.userInfo);
   // console.log(state?.user);
   if (loading) {

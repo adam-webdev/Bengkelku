@@ -6,37 +6,35 @@ import React, {
   createContext,
   useEffect,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 export const getUserInfo = async () => {
   try {
     const userInfo = await AsyncStorage.getItem("userInfo");
     console.log("getUserInfo", userInfo);
     return userInfo !== null ? JSON.parse(userInfo) : null;
   } catch (error) {
-    if (error instanceof SyntaxError) {
-      console.error("Invalid JSON:", error.message);
-    } else {
-      throw error;
-    }
+    console.error("Invalid JSON:", error.message);
   }
 };
-// export const getUserToken = async () => {
-//   try {
-//     const userToken = await AsyncStorage.getItem("token");
-//     return userToken !== "" ? userToken : "";
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+
+export const getUserToken = async () => {
+  try {
+    const userToken = await AsyncStorage.getItem("token");
+    return userToken !== "" ? userToken : "";
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const storeData = async (value) => {
   try {
     // const jsonValue = JSON.stringify(value);
-    console.log("json val = ", value);
-    console.log("json val user = ", value.user);
+    // console.log("json val = ", value.token);
+    console.log("json val user = ", value);
     await AsyncStorage.setItem("userInfo", JSON.stringify(value));
-    // await AsyncStorage.setItem("token", value.token);
+    await AsyncStorage.setItem("token", value.token);
   } catch (error) {
     if (error instanceof SyntaxError) {
       console.error("Invalid JSON:", error.message);
@@ -49,13 +47,15 @@ export const storeData = async (value) => {
 const deleteUserInfo = async () => {
   try {
     await AsyncStorage.removeItem("userInfo");
+    // await AsyncStorage.removeItem("token");
   } catch (err) {
     console.log(err);
   }
 };
 
 const initialState = {
-  userInfo: getUserInfo(),
+  userInfo: [],
+
   // userToken: getUserToken(),
 };
 const StateContext = createContext();
@@ -63,13 +63,13 @@ const StateContext = createContext();
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN": {
-      storeData(action.payload);
+      // storeData(action.payload);
       return { ...state, userInfo: action.payload };
     }
     case "LOGOUT": {
-      deleteUserInfo();
+      // deleteUserInfo();
       // AsyncStorage.removeItem("userInfo");
-      return { ...state, userInfo: [] };
+      return initialState;
     }
 
     default:
@@ -79,6 +79,19 @@ const reducer = (state, action) => {
 
 const Store = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const router = useRouter();
+  const checkLogin = async () => {
+    const data = await getUserInfo();
+    if (data) {
+      dispatch({ type: "LOGIN", payload: data });
+      router.replace("/home/HomeScreen");
+    } else {
+      router.replace("/Login");
+    }
+  };
+  useEffect(() => {
+    checkLogin();
+  }, []);
 
   return (
     <StateContext.Provider

@@ -10,26 +10,41 @@ import {
 import { useState, useEffect } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Link, Stack, useRouter, SplashScreen } from "expo-router";
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, getUserInfo } from "./hooks/Store";
 import Color from "./constants/Color";
+import { AsyncStorage } from "@react-native-async-storage/async-storage";
+import useToken from "./hooks/useToken";
 const Home = () => {
   const [ready, setReady] = useState(false);
+  const router = useRouter();
+  const { state, dispatch } = useStateContext();
+
+  // const checkLogin = async () => {
+  //   const data = await getUserInfo();
+  //   if (data) {
+  //     dispatch({ type: "LOGIN", payload: data });
+  //     router.push("/home/HomeScreen");
+  //   } else {
+  //     router.push("/Login");
+  //   }
+  // };
 
   useEffect(() => {
+    // checkLogin();
     setTimeout(() => {
       setReady(true);
     }, 3000);
-  });
-  const router = useRouter();
-  const { state } = useStateContext();
+  }, []);
+
+  // const token = useToken();
   // console.log("state", state?.userInfo._j.user.name);
   return (
     <SafeAreaView style={styles.container}>
-      {ready
+      {/* {ready
         ? state?.userInfo
           ? router.replace("/home/HomeScreen")
           : router.replace("/Login")
-        : ""}
+        : ""} */}
       {/* Use the aScreen` component to configure the layout. */}
       <Stack.Screen
         screenOptions={{

@@ -52,6 +52,7 @@ const Login = () => {
       if (result.success) {
         console.log("hasil ==> ", result);
         setData(result.data.user);
+        await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
         // const value = JSON.stringify(result);
         // AsyncStorage.removeItem("userInfo");
         // AsyncStorage.removeItem("token");
