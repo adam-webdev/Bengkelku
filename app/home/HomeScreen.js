@@ -13,7 +13,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, Link } from "expo-router";
 import { useStateContext, getUserInfo, getUserToken } from "./../hooks/Store";
 import Color from "../constants/Color";
-import { AsyncStorage } from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 
 import useDaerah from "./../hooks/useDaerah";
@@ -122,27 +122,39 @@ const HomeScreen = () => {
         console.log("Permission to access location was denied");
         return;
       }
-      // console.log("getting location", location);
-      // let currentLocation = await Location.getCurrentPositionAsync();
-      // console.log("current", currentLocation);
-      // setLocation(currentLocation);
-      try {
-        var curlocation = await Location.getCurrentPositionAsync({});
-      } catch {
-        curlocation = await Location.getCurrentPositionAsync({});
-      }
-      console.log(curlocation);
+      console.log("getting location", location);
+      let currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 1000,
+      });
+      console.log("current", currentLocation);
+      setLocation(currentLocation);
+      await AsyncStorage.setItem(
+        "userLocation",
+        JSON.stringify(currentLocation.coords)
+      );
+      dispatch({ type: "SAVE_LOCATION", payload: currentLocation.coords });
+      // console.log("curaatas",curlocation);
+      // try {
+      //   var curlocation = await Location.getCurrentPositionAsync({});
+      //   console.log("cur",curlocation);
+      // } catch {
+      //   curlocation = await Location.getCurrentPositionAsync({});
+      //   console.log(curlocation);aaa
+      // }
     };
-    const { coords } = curlocation;
+    // const { coords } = curlocation;
 
-    if (coords) {
-      const { latitude, longitude } = coords;
-    }
+    // if (coords) {
+    //   const { latitude, longitude } = coords;
+    // }
     getPermissionLocation();
   }, []);
 
   console.log("lokasi", location);
   console.log("home =>", state?.userInfo);
+  console.log("user location =>", state?.userLocation);
+  console.log("roles =>", state?.userInfo?.user?.roles[0]?.name);
   // console.log(state?.user);
   if (loading) {
     return (

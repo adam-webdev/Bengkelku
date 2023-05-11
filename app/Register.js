@@ -11,6 +11,7 @@ import {
 import { useState, Redirect } from "react";
 // import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Color from "./constants/Color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -63,6 +64,7 @@ const Register = () => {
       if (result?.success) {
         console.log("hasil ", result);
         setData(result.data.user);
+        await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
         dispatch({ type: "LOGIN", payload: result?.data });
         setLoading(false);
         router.replace("/home/HomeScreen");

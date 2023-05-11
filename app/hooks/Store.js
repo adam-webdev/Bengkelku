@@ -18,6 +18,15 @@ export const getUserInfo = async () => {
     console.error("Invalid JSON:", error.message);
   }
 };
+export const getUserLocation = async () => {
+  try {
+    const userLocation = await AsyncStorage.getItem("userLocation");
+    console.log("getuserLocation", userLocation);
+    return userLocation !== null ? JSON.parse(userLocation) : null;
+  } catch (error) {
+    console.error("Invalid JSON:", error.message);
+  }
+};
 
 export const getUserToken = async () => {
   try {
@@ -55,6 +64,7 @@ const deleteUserInfo = async () => {
 
 const initialState = {
   userInfo: [],
+  userLocation: [],
 
   // userToken: getUserToken(),
 };
@@ -64,7 +74,11 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN": {
       // storeData(action.payload);
-      return { ...state, userInfo: action.payload };
+      return { ...state, ...state.userLocation, userInfo: action.payload };
+    }
+    case "SAVE_LOCATION": {
+      // storeData(action.payload);
+      return { ...state, ...state.userInfo, userLocation: action.payload };
     }
     case "LOGOUT": {
       // deleteUserInfo();

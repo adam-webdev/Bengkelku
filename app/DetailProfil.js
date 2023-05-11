@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "expo-router";
 import { Stack } from "expo-router";
@@ -10,18 +18,18 @@ import IonIcons from "@expo/vector-icons/Ionicons";
 import useDaerah from "./hooks/useDaerah";
 import useToken from "./hooks/useToken";
 
-const DetailBengkel = ({ navigation }) => {
+const DetailProfil = ({ navigation }) => {
   const { id } = useSearchParams();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
 
-  const getDetailBengkel = async () => {
+  const getDetailProfil = async () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/bengkel/${id}`,
+        `http://192.168.43.175:8000/api/v1/user/${id}`,
         {
           method: "GET",
           headers: {
@@ -31,7 +39,7 @@ const DetailBengkel = ({ navigation }) => {
         }
       );
       const result = await response.json();
-      console.log("Bengkel =", result.data);
+      console.log("profil =", result.data);
       setData(result.data);
       setLoading(false);
     } catch (err) {
@@ -39,11 +47,13 @@ const DetailBengkel = ({ navigation }) => {
     }
   };
   useEffect(() => {
-    getDetailBengkel();
+    getDetailProfil();
   }, []);
 
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");
   const kota = useDaerah(data?.kota_id, "kota");
+  const kecamatan = useDaerah(data?.kecamatan_id, "kecamatan");
+  const desa = useDaerah(data?.desa_id, "desa");
 
   if (loading) {
     return (
@@ -79,23 +89,30 @@ const DetailBengkel = ({ navigation }) => {
               source={require("../assets/img/bengkel.jpg")}
             />
           )}
-        </View>
-        <View style={{ paddingVertical: 20, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {data?.nama_bengkel}
+          <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
+            {/* {data?.nama_bengkel}  */}
+            Adam dwi maulana
           </Text>
+          {/* <Text>
+            {kota?.name}, {provinsi?.name}
+          </Text> */}
           <Text>
-            {kota.name}, {provinsi.name}
+            {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
           </Text>
+        </View>
+        <View style={{ paddingVertical: 10, paddingHorizontal: 10 }}>
+          {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+            {data?.nama_bengkel}
+          </Text> */}
+
           <Text
             style={{
               fontSize: 16,
-              marginTop: 10,
               marginBottom: 5,
               fontWeight: "bold",
             }}
           >
-            Kontak :
+            Detail :
           </Text>
 
           <View style={styles.itemWrapp}>
@@ -116,18 +133,35 @@ const DetailBengkel = ({ navigation }) => {
             />
             <Text style={styles.itemText}> {data?.email} </Text>
           </View>
-          <Text
-            style={{
-              fontSize: 16,
-              marginTop: 10,
-              marginBottom: 5,
-              fontWeight: "bold",
-            }}
-          >
-            Alamat :
-          </Text>
-
+          <View style={[styles.itemWrapp, { alignItems: "center" }]}>
+            <IonIcons
+              size={26}
+              style={styles.icon}
+              name="location"
+              color={Color.primary}
+            />
+            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
+              Alamat :
+            </Text>
+          </View>
           <View style={styles.itemWrapp}>
+            <Text style={[styles.itemText, { width: "25%" }]}>Desa </Text>
+            <Text style={styles.itemText}>: {desa?.name ?? "-"}</Text>
+          </View>
+          <View style={styles.itemWrapp}>
+            <Text style={[styles.itemText, { width: "25%" }]}>Kecamatan </Text>
+            <Text style={styles.itemText}>: {kecamatan?.name ?? "-"}</Text>
+          </View>
+          <View style={styles.itemWrapp}>
+            <Text style={[styles.itemText, { width: "25%" }]}>Kota </Text>
+            <Text style={styles.itemText}>: {kota?.name ?? "-"}</Text>
+          </View>
+          <View style={styles.itemWrapp}>
+            <Text style={[styles.itemText, { width: "25%" }]}>Provinsi </Text>
+            <Text style={styles.itemText}>: {provinsi?.name ?? "-"}</Text>
+          </View>
+
+          {/* <View style={styles.itemWrapp}>
             <Foundation
               size={26}
               style={styles.icon}
@@ -138,26 +172,30 @@ const DetailBengkel = ({ navigation }) => {
               {" "}
               {data?.jam_buka} - {data?.jam_tutup}
             </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <IonIcons
-              size={26}
-              style={styles.icon}
-              name="location"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}>
-              {" "}
-              {data?.alamat_lengkap}, {kota.name}, {provinsi.name}
-            </Text>
-          </View>
+          </View> */}
+          <View style={styles.itemWrapp}></View>
         </View>
+        <TouchableOpacity style={styles.button}>
+          <Text
+            style={{
+              textAlign: "center",
+              color: Color.secondaryColor,
+              fontSize: 18,
+            }}
+          >
+            Edit Profile
+          </Text>
+          <Octicons
+            name="chevron-right"
+            style={{ color: Color.secondaryColor, fontSize: 20 }}
+          />
+        </TouchableOpacity>
       </View>
     </>
   );
 };
 
-export default DetailBengkel;
+export default DetailProfil;
 
 const styles = StyleSheet.create({
   container: {
@@ -168,15 +206,17 @@ const styles = StyleSheet.create({
   },
   boxImage: {
     // width: 50,
-    // height: 50,
+    height: 280,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   image: {
     objectFit: "cover",
-    width: "100%",
-    height: 300,
+    width: 200,
+    height: 200,
+    borderRadius: 200,
     // borderRadius: 10,
   },
   itemWrapp: {
@@ -199,5 +239,18 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+  },
+  button: {
+    backgroundColor: "#fff",
+    // backgroundColor: "#0000a7",
+    cursor: "pointer",
+    // color: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    marginHorizontal: 10,
+    // borderRadius: 8,
   },
 });
