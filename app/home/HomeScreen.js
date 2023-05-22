@@ -54,7 +54,7 @@ const Card = ({ item }) => {
             source={require("../../assets/banner/banner.png")}
           />
         )}
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: 8, flex: "wrap" }}>
           <Text style={{ fontSize: 16, fontWeight: "bold" }}>
             {item.nama_bengkel}
           </Text>
@@ -102,7 +102,7 @@ const HomeScreen = () => {
         }
       );
       const result = await response.json();
-      console.log("Bengkel =", result.data);
+      // console.log("Bengkel =", result.data);
       setData(result.data);
       setLoading(false);
     } catch (err) {
@@ -117,17 +117,17 @@ const HomeScreen = () => {
   useEffect(() => {
     const getPermissionLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log("status", status);
+      // console.log("status", status);
       if (status !== "granted") {
         console.log("Permission to access location was denied");
         return;
       }
-      console.log("getting location", location);
+      // console.log("getting location", location);
       let currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
         maximumAge: 1000,
       });
-      console.log("current", currentLocation);
+      // console.log("current", currentLocation);
       setLocation(currentLocation);
       await AsyncStorage.setItem(
         "userLocation",
@@ -151,10 +151,10 @@ const HomeScreen = () => {
     getPermissionLocation();
   }, []);
 
-  console.log("lokasi", location);
-  console.log("home =>", state?.userInfo);
-  console.log("user location =>", state?.userLocation);
-  console.log("roles =>", state?.userInfo?.user?.roles[0]?.name);
+  // console.log("lokasi", location);
+  // console.log("home =>", state?.userInfo);
+  // console.log("user location =>", state?.userLocation);
+  // console.log("roles =>", state?.userInfo?.user?.roles[0]?.name);
   // console.log(state?.user);
   if (loading) {
     return (

@@ -36,9 +36,13 @@ const ProfileScreen = () => {
         {
           text: "Iya",
           onPress: async () => {
-            await AsyncStorage.removeItem("userInfo");
-            dispatch({ type: "LOGOUT" });
-            router.replace("/Login");
+            try {
+              await AsyncStorage.removeItem("userInfo");
+              dispatch({ type: "LOGOUT", payload: "" });
+              router.replace("/Login");
+            } catch (error) {
+              console.log("logout error", error);
+            }
           },
         },
       ]

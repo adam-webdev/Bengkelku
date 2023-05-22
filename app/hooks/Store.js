@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 export const getUserInfo = async () => {
   try {
     const userInfo = await AsyncStorage.getItem("userInfo");
-    console.log("getUserInfo", userInfo);
+    // console.log("getUserInfo", userInfo);
     return userInfo !== null ? JSON.parse(userInfo) : null;
   } catch (error) {
     console.error("Invalid JSON:", error.message);
@@ -21,7 +21,7 @@ export const getUserInfo = async () => {
 export const getUserLocation = async () => {
   try {
     const userLocation = await AsyncStorage.getItem("userLocation");
-    console.log("getuserLocation", userLocation);
+    // console.log("getuserLocation", userLocation);
     return userLocation !== null ? JSON.parse(userLocation) : null;
   } catch (error) {
     console.error("Invalid JSON:", error.message);
@@ -41,7 +41,7 @@ export const storeData = async (value) => {
   try {
     // const jsonValue = JSON.stringify(value);
     // console.log("json val = ", value.token);
-    console.log("json val user = ", value);
+    // console.log("json val user = ", value);
     await AsyncStorage.setItem("userInfo", JSON.stringify(value));
     await AsyncStorage.setItem("token", value.token);
   } catch (error) {

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "expo-router";
+import { useSearchParams, useRouter } from "expo-router";
 import { Stack } from "expo-router";
 import { useStateContext } from "./hooks/Store";
 import Color from "./constants/Color";
@@ -24,7 +24,7 @@ const DetailProfil = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
-
+  const router = useRouter();
   const getDetailProfil = async () => {
     setLoading(true);
     try {
@@ -99,6 +99,43 @@ const DetailProfil = ({ navigation }) => {
           <Text>
             {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
           </Text>
+          {data?.tipe_user === null ? (
+            <>
+              <TouchableOpacity
+                onPress={() => router.push("/CreateBengkel")}
+                style={{
+                  backgroundColor: Color.secondaryColor,
+                  paddingHorizontal: 12,
+                  paddingVertical: 5,
+                  borderRadius: 4,
+                  marginTop: 6,
+                }}
+              >
+                <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                  Buat Bengkel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/CreateBengkel")}
+                style={{
+                  backgroundColor: Color.secondaryColor,
+                  paddingHorizontal: 12,
+                  paddingVertical: 5,
+                  borderRadius: 4,
+                  marginTop: 6,
+                }}
+              >
+                <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                  Buat Bengkel
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            ""
+          )}
+          {/* <TouchableOpacity>
+            <Text>Bengkel Saya</Text>
+          </TouchableOpacity> */}
         </View>
         <View style={{ paddingVertical: 10, paddingHorizontal: 10 }}>
           {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
@@ -175,11 +212,14 @@ const DetailProfil = ({ navigation }) => {
           </View> */}
           <View style={styles.itemWrapp}></View>
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/EditProfile/?id=" + data?.id)}
+        >
           <Text
             style={{
               textAlign: "center",
-              color: Color.secondaryColor,
+              color: Color.primary,
               fontSize: 18,
             }}
           >
@@ -187,7 +227,7 @@ const DetailProfil = ({ navigation }) => {
           </Text>
           <Octicons
             name="chevron-right"
-            style={{ color: Color.secondaryColor, fontSize: 20 }}
+            style={{ color: Color.primary, fontSize: 20 }}
           />
         </TouchableOpacity>
       </View>
@@ -206,7 +246,7 @@ const styles = StyleSheet.create({
   },
   boxImage: {
     // width: 50,
-    height: 280,
+    height: 330,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
@@ -225,7 +265,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 4,
     backgroundColor: "#fff",
-    paddingVertical: 10,
+    paddingVertical: 6,
     gap: 8,
     // shadowProp: {
     shadowColor: "#171717",

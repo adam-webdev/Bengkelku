@@ -36,7 +36,8 @@ const Login = () => {
   const handleLogin = async () => {
     setLoading(true);
     setError(false);
-
+    console.log("email", email);
+    console.log("password", password);
     try {
       const response = await fetch("http://192.168.43.175:8000/api/v1/login", {
         headers: {
@@ -53,12 +54,6 @@ const Login = () => {
         console.log("hasil ==> ", result);
         setData(result.data.user);
         await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
-        // const value = JSON.stringify(result);
-        // AsyncStorage.removeItem("userInfo");
-        // AsyncStorage.removeItem("token");
-        // AsyncStorage.setItem("userInfo", value.user);
-        // AsyncStorage.setItem("token", value.token);
-        // console.log("valueeee", value);
         dispatch({ type: "LOGIN", payload: result.data });
         setLoading(false);
         router.replace("/home/HomeScreen");
@@ -133,8 +128,8 @@ const Login = () => {
               secureTextEntry={passwordVisibility}
               autoCapitalize="none"
               autoCorrect={false}
-              textContentType="newPassword"
-              secureTextEntry={passwordVisibility}
+              // textContentType="newPassword"
+              // secureTextEntry={passwordVisibility}
               value={password}
               enablesReturnKeyAutomatically
               onChangeText={(text) => setPassword(text)}
@@ -178,25 +173,32 @@ const Login = () => {
           </Text>
         </View>
         <Text style={styles.linkRegister}>Belum punya akun ? </Text>
-        <Text style={styles.linkRegister}>Daftar sebagai : </Text>
+        <Text
+          onPress={() => {
+            router.push("/Register");
+          }}
+          style={styles.linkDaftar}
+        >
+          Daftar sekarang
+        </Text>
         <View style={styles.linkdaftar}>
-          <Text
+          {/* <Text
             onPress={() => {
               router.push("/RegisterBengkel");
             }}
             style={styles.linkDaftar}
           >
             User Bengkel
-          </Text>
-          <Text style={styles.linkRegister}> Atau </Text>
-          <Text
+          </Text> */}
+          {/* <Text style={styles.linkRegister}> Atau </Text> */}
+          {/* <Text
             onPress={() => {
               router.push("/Register");
             }}
             style={styles.linkDaftar}
           >
             User Biasa
-          </Text>
+          </Text> */}
         </View>
 
         {/* Use the `Link` compoSnent to enable optimized client-side routing. */}

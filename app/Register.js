@@ -111,7 +111,7 @@ const Register = () => {
 
         <View style={styles.viewTitle}>
           <Text style={styles.font1}>Silahkan Daftar </Text>
-          <Text style={styles.font2}>Sebagai User Biasa </Text>
+          <Text style={styles.font2}>Sebagai User </Text>
         </View>
         <View>
           <TextInput

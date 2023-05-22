@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useStateContext } from "./Store";
-import { AsyncStorage } from "@react-native-async-storage/async-storage";
 
 const useDaerah = (id, name) => {
   const [data, setData] = useState([]);
