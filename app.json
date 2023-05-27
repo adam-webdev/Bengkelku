@@ -19,6 +19,9 @@
       "bundler": "metro"
     },
     "name": "Bengkelku",
-    "slug": "Bengkelku"
+    "slug": "Bengkelku",
+    "android": {
+      "usesCleartextTraffic": true
+    }
   }
 }

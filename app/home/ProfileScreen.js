@@ -54,6 +54,7 @@ const ProfileScreen = () => {
       //     ),
       // }
     );
+  console.log("profile screen", state);
   return (
     <>
       <View style={styles.container}>

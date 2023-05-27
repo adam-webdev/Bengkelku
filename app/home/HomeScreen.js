@@ -54,12 +54,12 @@ const Card = ({ item }) => {
             source={require("../../assets/banner/banner.png")}
           />
         )}
-        <View style={{ gap: 8, flex: "wrap" }}>
+        <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 16, fontWeight: "bold" }}>
             {item.nama_bengkel}
           </Text>
           <Text style={{ fontSize: 12 }}>
-            {kota?.name}, {provinsi?.name}
+            {kota?.name},\n {provinsi?.name}
           </Text>
           <Text style={{ color: "grey", fontSize: 12 }}>Jarak 100 meter</Text>
         </View>
@@ -76,17 +76,6 @@ const HomeScreen = () => {
   const router = useRouter();
   // const token = useToken();
 
-  // const checkLogin = async () => {
-  //   const data = await getUserInfo();
-  //   if (data) {
-  //     dispatch({ type: "LOGIN", payload: data });
-  //   } else {
-  //     router.replace("/Login");
-  //   }
-  // };
-  // useEffect(() => {
-  //   checkLogin();
-  // }, []);
   const getDataBengkel = async () => {
     // console.log("token", token);
     setLoading(true);

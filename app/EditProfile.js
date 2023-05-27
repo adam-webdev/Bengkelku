@@ -12,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "expo-router";
+import { useSearchParams, useLocalSearchParams, useRouter } from "expo-router";
 import { Stack } from "expo-router";
 import { useStateContext } from "./hooks/Store";
 import Color from "./constants/Color";
@@ -23,6 +23,7 @@ import useDaerah from "./hooks/useDaerah";
 import useToken from "./hooks/useToken";
 import SelectDropdown from "react-native-select-dropdown";
 import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EditProfile = ({ navigation }) => {
   const { id } = useSearchParams();
@@ -30,33 +31,37 @@ const EditProfile = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [region, setRegion] = useState("");
-  const { state } = useStateContext();
+  const { state, dispatch } = useStateContext();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [image, setImage] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [telp, setTelp] = useState("");
-  const [jenisKelamin, setJenisKelamin] = useState("");
+  const [image, setImage] = useState();
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [telp, setTelp] = useState();
+  const [jenisKelamin, setJenisKelamin] = useState();
   const jenis_kelamin = ["Laki-laki", "Perempuan"];
-
+  const router = useRouter();
+  // const { nameParams, emialParams, telpParams } = params;
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       // allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    console.log(result);
+    // console.log(result);
 
     if (!result.canceled) {
-      let filename = result.assets[0].uri.split("/").pop();
+      // console.log(result.assets[0]);
+      let filename = result.assets[0];
+
+      // let filename = result.assets[0].uri.split("/").pop();
+      // let filename = result.assets[0].uri;
       setImage(filename);
     }
   };
-  // console.log("file => ", filename);
 
   const getDetailProfil = async () => {
     setLoading(true);
@@ -74,6 +79,13 @@ const EditProfile = ({ navigation }) => {
       const result = await response.json();
       console.log("profil =", result.data);
       setData(result.data);
+      setName(result.data.name);
+      setEmail(result.data.email);
+      setTelp(result.data.no_hp);
+
+      // let filename = result.data.foto.split("/").pop();
+      // setImage(filename);
+      setJenisKelamin(result.data.jenis_kelamin);
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -82,29 +94,98 @@ const EditProfile = ({ navigation }) => {
   useEffect(() => {
     getDetailProfil();
   }, []);
+  // const getExtention = (fileExtension) => {
+  //   switch (fileExtension) {
+  //     case "application/pdf":
+  //       return ".pdf";
+  //     case "image/jpeg":
+  //       return ".jpg";
+  //     case "image/jpg":
+  //       return ".jpg";
+  //     case "image/png":
+  //       return ".png";
+  //     default:
+  //       return ".jpg";
+  //   }
+  // };
+  // console.log("for-mdata", formData);
+  const handlePerubahan = async () => {
+    setLoading(true);
+    setError(false);
+    // const typeFile = fileExtension(image);
+    const formData = new FormData();
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-      }
-      // Location.setGoogleApiKey(apiKey);
-      console.log("status location", state?.userLocation?.latitude);
-
-      let regionName = await Location.reverseGeocodeAsync({
-        // latitude: 19.2514799,
-        // longitude: 75.7138884,
-        latitude: state?.userLocation?.latitude,
-        longitude: state?.userLocation?.longitude,
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("no_hp", telp);
+    if (image) {
+      const uriParts = image.uri.split(".");
+      // console.log("uri", uriParts);
+      const fileType = uriParts[uriParts.length - 1];
+      console.log("uri", uriParts, "file type", fileType);
+      formData.append("foto", {
+        name: "profilePic",
+        type: `image/${fileType}`,
+        uri:
+          Platform.OS === "ios" ? image.uri.replace("file://", "") : image.uri,
       });
+    }
 
-      setRegion(regionName);
-      console.log(regionName, "nothing");
+    formData.append("jenis_kelamin", jenisKelamin);
 
-      // console.log();
-    })();
-  }, []);
+    try {
+      console.log("form-data", formData);
+      console.log("mulai");
+      const response = await fetch(
+        `http://192.168.43.175:8000/api/v1/user/${id}`,
+        {
+          headers: {
+            // "Content-Type": "application/json",
+            // "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + state?.userInfo?.token,
+            // "Content-Type":
+            //   "multipart/form-data; charset=utf-8; boundary=" +
+            //   Math.random().toString().substr(2),
+          },
+          method: "POST",
+          body: formData,
+        }
+      );
+      console.log("selesai", response);
+      const result = await response.json();
+      console.log("resultan", result);
+      // getDetailProfil();
+      await AsyncStorage.removeItem("userInfo");
+      await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
+      dispatch({ type: "UPDATE_PROFIL", payload: result.data });
+      setLoading(false);
+      router.push("/DetailProfil/?id=" + id);
+    } catch (error) {
+      console.log("error = ", error);
+    }
+  };
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //     }
+  //     // Location.setGoogleApiKey(apiKey);
+  //     console.log("status location", state?.userLocation?.latitude);
+
+  //     let regionName = await Location.reverseGeocodeAsync({
+  //       // latitude: 19.2514799,
+  //       // longitude: 75.7138884,
+  //       latitude: state?.userLocation?.latitude,
+  //       longitude: state?.userLocation?.longitude,
+  //     });
+
+  //     setRegion(regionName);
+  //     console.log(regionName, "nothing");
+
+  //     // console.log();
+  //   })();
+  // }, []);
 
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");
   const kota = useDaerah(data?.kota_id, "kota");
@@ -135,6 +216,7 @@ const EditProfile = ({ navigation }) => {
           headerShown: false,
           headerLeft: () => <></>,
         }}
+        style={{ flex: 2 }}
       />
       <View style={styles.container}>
         <View style={styles.boxImage}>
@@ -153,7 +235,7 @@ const EditProfile = ({ navigation }) => {
                 }}
                 onPress={() => pickImage()}
               >
-                <FontAwesome name={"camera"} color={"#fff"} size={18} />
+                <FontAwesome name="camera" color={"#fff"} size={18} />
                 <Text style={{ color: "#fff" }}>Ubah Foto</Text>
               </TouchableOpacity>
             </>
@@ -172,12 +254,13 @@ const EditProfile = ({ navigation }) => {
                   marginTop: 10,
                   marginRight: 10,
                 }}
+                // placeholder={data?.name}
+                // defaultValue={data?.name}
+                // value={name ? name : data?.name}
                 value={name}
                 onChangeText={(text) => setName(text)}
-              >
-                {data?.name}
-              </TextInput>
-              <FontAwesome name={"pencil"} color={Color.primary} size={14} />
+              />
+              <FontAwesome name="pencil" color={Color.primary} size={14} />
             </View>
           ) : (
             <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
@@ -192,6 +275,7 @@ const EditProfile = ({ navigation }) => {
             {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
           </Text>
         </View>
+
         <View style={{ width: "100%" }}>
           {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
             {data?.nama_bengkel}
@@ -217,14 +301,14 @@ const EditProfile = ({ navigation }) => {
             />
             <TextInput
               style={styles.itemText}
+              // value={telp ? telp : data?.no_hp}
               value={telp}
               keyboardType="numeric"
+              // placeholder={data?.no_hp}
+              // defaultValue={data?.no_hp}
               onChangeText={(text) => setTelp(text)}
-            >
-              {" "}
-              {data?.no_hp}
-            </TextInput>
-            <FontAwesome name={"pencil"} color={Color.primary} size={14} />
+            />
+            <FontAwesome name="pencil" color={Color.primary} size={14} />
           </View>
           <View style={styles.itemWrapp}>
             <MaterialCommunityIcons
@@ -235,13 +319,13 @@ const EditProfile = ({ navigation }) => {
             />
             <TextInput
               style={styles.itemText}
+              // value={email ? email : data?.email}
               value={email}
+              // placeholder={data?.email}
+              // defaultValue={data?.email}
               onChangeText={(text) => setEmail(text)}
-            >
-              {" "}
-              {data?.email}{" "}
-            </TextInput>
-            <FontAwesome name={"pencil"} color={Color.primary} size={14} />
+            />
+            <FontAwesome name="pencil" color={Color.primary} size={14} />
           </View>
           {/* <View style={[styles.itemWrapp, { alignItems: "center" }]}>
             <IonIcons
@@ -264,7 +348,8 @@ const EditProfile = ({ navigation }) => {
               onSelect={(selectedItem, index) => {
                 setJenisKelamin(selectedItem);
               }}
-              defaultButtonText={"-- Pilih opsi --"}
+              defaultValue={jenisKelamin}
+              defaultButtonText={jenisKelamin}
               buttonTextAfterSelection={(selectedItem, index) => {
                 return selectedItem;
               }}
@@ -288,28 +373,30 @@ const EditProfile = ({ navigation }) => {
               rowStyle={styles.dropdown1RowStyle}
               rowTextStyle={styles.dropdown1RowTxtStyle}
             />
-            <FontAwesome name={"pencil"} color={Color.primary} size={14} />
+            <FontAwesome name="pencil" color={Color.primary} size={14} />
           </View>
-
-          <View style={styles.itemWrapp}></View>
         </View>
       </View>
-
-      <TouchableOpacity style={styles.button}>
-        <Text
-          style={{
-            textAlign: "center",
-            color: "#fff",
-            fontSize: 18,
-          }}
+      <View style={styles.wrappButton}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handlePerubahan()}
         >
-          Simpan Perubahan
-        </Text>
-        <Octicons
-          name="chevron-right"
-          style={{ color: "#fff", fontSize: 20 }}
-        />
-      </TouchableOpacity>
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#fff",
+              fontSize: 18,
+            }}
+          >
+            Simpan Perubahan
+          </Text>
+          <Octicons
+            name="chevron-right"
+            style={{ color: "#fff", fontSize: 20 }}
+          />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -318,7 +405,8 @@ export default EditProfile;
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: 100,
+    flex: 1,
+    flexDirection: "column",
     // backgroundColor: "#0000a7",
   },
   container: {
@@ -326,7 +414,7 @@ const styles = StyleSheet.create({
     // margin: 10,
     // paddingHorizontal: 10,
     fontSize: 16,
-    flex: 1,
+    flex: 3,
   },
   boxImage: {
     // width: 50,
@@ -374,6 +462,9 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 30,
     borderRadius: 4,
+  },
+  wrappButton: {
+    marginTop: 15,
   },
   button: {
     backgroundColor: Color.primary,

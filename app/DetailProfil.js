@@ -64,7 +64,13 @@ const DetailProfil = ({ navigation }) => {
       />
     );
   }
-
+  // const users = {
+  //   name: data.name,
+  //   no_hp: data.no_hp,
+  //   email: data.email,
+  //   jenis_kelamin: data.jenis_kelamin,
+  //   foto: data.foto,
+  // };
   return (
     <>
       <Stack
@@ -81,8 +87,8 @@ const DetailProfil = ({ navigation }) => {
       />
       <View style={styles.container}>
         <View style={styles.boxImage}>
-          {data?.foto_bengkel ? (
-            <Image style={styles.image} source={{ uri: data?.foto_bengkel }} />
+          {data?.foto ? (
+            <Image style={styles.image} source={{ uri: data?.foto }} />
           ) : (
             <Image
               style={styles.image}
@@ -91,7 +97,7 @@ const DetailProfil = ({ navigation }) => {
           )}
           <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
             {/* {data?.nama_bengkel}  */}
-            Adam dwi maulana
+            {data?.name}
           </Text>
           {/* <Text>
             {kota?.name}, {provinsi?.name}
@@ -99,7 +105,7 @@ const DetailProfil = ({ navigation }) => {
           <Text>
             {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
           </Text>
-          {data?.tipe_user === null ? (
+          {/* {data?.tipe_user === null ? (
             <>
               <TouchableOpacity
                 onPress={() => router.push("/CreateBengkel")}
@@ -132,7 +138,7 @@ const DetailProfil = ({ navigation }) => {
             </>
           ) : (
             ""
-          )}
+          )} */}
           {/* <TouchableOpacity>
             <Text>Bengkel Saya</Text>
           </TouchableOpacity> */}
@@ -214,7 +220,12 @@ const DetailProfil = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/EditProfile/?id=" + data?.id)}
+          onPress={() =>
+            router.push({
+              pathname: "/EditProfile",
+              params: { id: data?.id },
+            })
+          }
         >
           <Text
             style={{
