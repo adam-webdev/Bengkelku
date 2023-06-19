@@ -1,7 +1,14 @@
-import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "expo-router";
-import { Stack } from "expo-router";
+import { useSearchParams, useRouter, Stack } from "expo-router";
+// import { Stack } from "expo-router";
 import { useStateContext } from "./hooks/Store";
 import Color from "./constants/Color";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -9,6 +16,7 @@ import Foundation from "@expo/vector-icons/Foundation";
 import IonIcons from "@expo/vector-icons/Ionicons";
 import useDaerah from "./hooks/useDaerah";
 import useToken from "./hooks/useToken";
+import Chatbot from "@expo/vector-icons/FontAwesome5";
 
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
@@ -16,7 +24,7 @@ const DetailBengkel = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
-
+  const router = useRouter();
   const getDetailBengkel = async () => {
     setLoading(true);
     try {
@@ -151,6 +159,13 @@ const DetailBengkel = ({ navigation }) => {
               {data?.alamat_lengkap}, {kota.name}, {provinsi.name}
             </Text>
           </View>
+          <TouchableOpacity
+            style={styles.linkChatbot}
+            onPress={() => router.push("/ChatBot")}
+          >
+            <Chatbot color={"#fff"} size={30} name="headset" />
+            <Text style={styles.textChatbot}>ChatBot</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </>
@@ -186,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     paddingVertical: 10,
-    gap: 8,
+    // gap: 8,
     // shadowProp: {
     shadowColor: "#171717",
     shadowOffset: { width: -2, height: 4 },
@@ -199,5 +214,19 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+  },
+  linkChatbot: {
+    backgroundColor: Color.secondaryColor,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    borderRadius: 6,
+    marginTop: 10,
+    padding: 8,
+  },
+  textChatbot: {
+    fontSize: 18,
+    color: "#fff",
   },
 });

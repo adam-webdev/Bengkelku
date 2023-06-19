@@ -27,6 +27,7 @@ export default Layout = () => {
           headerShown: false,
           tabBarActiveTintColor: Color.primary,
           tabBarInactiveTintColor: "grey",
+          tabBarHideOnKeyboard: true,
           tabBarLabelStyle: {
             fontSize: 13,
           },
@@ -77,6 +78,15 @@ export default Layout = () => {
             tabBarLabel: "Transaksi",
           }}
         />
+        {/* <Tabs.Screen
+          name="ChatBot"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Transaksi name="headset" color={color} size={24} />
+            ),
+            tabBarLabel: "ChatBot",
+          }}
+        /> */}
         <Tabs.Screen
           name="ProfileScreen"
           options={{

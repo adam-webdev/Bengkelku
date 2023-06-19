@@ -22,6 +22,7 @@
     "slug": "Bengkelku",
     "android": {
       "usesCleartextTraffic": true
+      // "softwareKeyboardLayoutMode": "pan"
     }
   }
 }
