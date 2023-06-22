@@ -5,7 +5,9 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
+import * as Linking from "expo-linking";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter, Stack } from "expo-router";
 // import { Stack } from "expo-router";
@@ -17,6 +19,7 @@ import IonIcons from "@expo/vector-icons/Ionicons";
 import useDaerah from "./hooks/useDaerah";
 import useToken from "./hooks/useToken";
 import Chatbot from "@expo/vector-icons/FontAwesome5";
+import Whatsapp from "@expo/vector-icons/FontAwesome";
 
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
@@ -62,12 +65,35 @@ const DetailBengkel = ({ navigation }) => {
       />
     );
   }
+  const sendWhatsApp = (phone) => {
+    let msg = "type something";
+    let phoneWithCountryCode = phone;
 
+    let mobile =
+      Platform.OS == "ios" ? phoneWithCountryCode : "+" + phoneWithCountryCode;
+    if (mobile) {
+      if (msg) {
+        let url = "whatsapp://send?text=" + msg + "&phone=" + mobile;
+        Linking.openURL(url)
+          .then((data) => {
+            console.log("WhatsApp Opened");
+          })
+          .catch(() => {
+            alert("Make sure WhatsApp installed on your device");
+          });
+      } else {
+        alert("Please insert message to send");
+      }
+    } else {
+      alert("Please insert mobile no");
+    }
+  };
   return (
     <>
       <Stack
+        name="DetailBengkel"
         screenOptions={{
-          headerTitle: "Detail",
+          // headerTitle: "Detail",
           headerStyle: {
             backgroundColor: "#fff",
           },
@@ -76,98 +102,113 @@ const DetailBengkel = ({ navigation }) => {
           headerShown: false,
           headerLeft: () => <></>,
         }}
+        options={{
+          title: "Detail Bengkel",
+        }}
       />
-      <View style={styles.container}>
-        <View style={styles.boxImage}>
-          {data?.foto_bengkel ? (
-            <Image style={styles.image} source={{ uri: data?.foto_bengkel }} />
-          ) : (
-            <Image
-              style={styles.image}
-              source={require("../assets/img/bengkel.jpg")}
-            />
-          )}
-        </View>
-        <View style={{ paddingVertical: 20, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {data?.nama_bengkel}
-          </Text>
-          <Text>
-            {kota.name}, {provinsi.name}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              marginTop: 10,
-              marginBottom: 5,
-              fontWeight: "bold",
-            }}
-          >
-            Kontak :
-          </Text>
-
-          <View style={styles.itemWrapp}>
-            <Foundation
-              size={26}
-              style={styles.icon}
-              name="telephone"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}> {data?.no_hp}</Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={styles.boxImage}>
+            {data?.foto_bengkel ? (
+              <Image
+                style={styles.image}
+                source={{ uri: data?.foto_bengkel }}
+              />
+            ) : (
+              <Image
+                style={styles.image}
+                source={require("../assets/img/bengkel.jpg")}
+              />
+            )}
           </View>
-          <View style={styles.itemWrapp}>
-            <MaterialCommunityIcons
-              size={26}
-              style={styles.icon}
-              name="email"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}> {data?.email} </Text>
-          </View>
-          <Text
-            style={{
-              fontSize: 16,
-              marginTop: 10,
-              marginBottom: 5,
-              fontWeight: "bold",
-            }}
-          >
-            Alamat :
-          </Text>
-
-          <View style={styles.itemWrapp}>
-            <Foundation
-              size={26}
-              style={styles.icon}
-              name="clock"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}>
-              {" "}
-              {data?.jam_buka} - {data?.jam_tutup}
+          <View style={{ paddingVertical: 20, paddingHorizontal: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              {data?.nama_bengkel}
             </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <IonIcons
-              size={26}
-              style={styles.icon}
-              name="location"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}>
-              {" "}
-              {data?.alamat_lengkap}, {kota.name}, {provinsi.name}
+            <Text>
+              {kota.name}, {provinsi.name}
             </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                marginTop: 10,
+                marginBottom: 5,
+                fontWeight: "bold",
+              }}
+            >
+              Kontak :
+            </Text>
+
+            <View style={styles.itemWrapp}>
+              <Foundation
+                size={26}
+                style={styles.icon}
+                name="telephone"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}> {data?.no_hp}</Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <MaterialCommunityIcons
+                size={26}
+                style={styles.icon}
+                name="email"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}> {data?.email} </Text>
+            </View>
+            <Text
+              style={{
+                fontSize: 16,
+                marginTop: 10,
+                marginBottom: 5,
+                fontWeight: "bold",
+              }}
+            >
+              Alamat :
+            </Text>
+
+            <View style={styles.itemWrapp}>
+              <Foundation
+                size={26}
+                style={styles.icon}
+                name="clock"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}>
+                {" "}
+                {data?.jam_buka} - {data?.jam_tutup}
+              </Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <IonIcons
+                size={26}
+                style={styles.icon}
+                name="location"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}>
+                {" "}
+                {data?.alamat_lengkap}, {kota.name}, {provinsi.name}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.linkChatbot}
+              onPress={() => router.push("/ChatBot")}
+            >
+              <Chatbot color={"#fff"} size={30} name="headset" />
+              <Text style={styles.textChatbot}>ChatBot</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.linkChatbot, { backgroundColor: "green" }]}
+              onPress={() => sendWhatsApp(data?.no_hp)}
+            >
+              <Whatsapp color={"#fff"} size={30} name="whatsapp" />
+              <Text style={styles.textChatbot}>Hubungi</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.linkChatbot}
-            onPress={() => router.push("/ChatBot")}
-          >
-            <Chatbot color={"#fff"} size={30} name="headset" />
-            <Text style={styles.textChatbot}>ChatBot</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 };
