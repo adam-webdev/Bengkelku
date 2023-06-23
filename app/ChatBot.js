@@ -12,6 +12,7 @@ import Color from "./constants/Color";
 import Bot from "@expo/vector-icons/FontAwesome5";
 
 import { useStateContext } from "./hooks/Store";
+import { useRouter } from "expo-router";
 
 const Card = ({ text }) => {
   let date = new Date();
@@ -37,12 +38,79 @@ const CardUser = ({ item }) => {
   let date = new Date();
   let hours = date.getHours();
   let minutes = date.getMinutes();
-  console.log("cardUser", item.text);
+  console.log("cardUser", item);
   const data = item.text;
 
-  console.log("tem state", state.userInfo.user.foto);
+  // console.log("tem state", state.userInfo.user.foto);
 
   if (Array.isArray(item.text)) {
+    if (item.url == 2) {
+      return data.map((text, index) => (
+        <View
+          key={index}
+          style={[
+            styles.cardWrapper,
+            { flexDirection: item.type === "user" ? "row-reverse" : "row" },
+          ]}
+        >
+          <View style={styles.imageWrapper}>
+            {item.type === "user" ? (
+              // <Image
+              //   style={styles.image}
+              //   source={{ uri: state.userInfo.user.foto }}
+              // />
+              <Bot name="user-circle" size={24} />
+            ) : (
+              <Bot name="robot" size={24} />
+            )}
+          </View>
+          <View
+            style={[
+              styles.boxCard,
+              styles.shadowProp,
+              // { backgroundColor: item.type === "user" ? "#fafbff" : "#fff" },
+            ]}
+          >
+            <Text
+              style={[
+                styles.fontCard,
+                { color: item.type === "user" ? Color.primary : "#000" },
+                { fontWeight: item.type === "user" ? "bold" : "normal" },
+                { flexDirection: "column" },
+              ]}
+            >
+              <Text>
+                Nama : {text.nama_bengkel ? text.nama_bengkel : text.name},{" "}
+              </Text>
+              <Text>Kontak : {text.no_hp}, </Text>
+              <Text>Email : {text.email}, </Text>
+              {text.nama_bengkel ? (
+                <Text>Alamat Detail : {text.alamat_lengkap}</Text>
+              ) : (
+                ""
+              )}
+            </Text>
+            <Text style={[styles.fontCard, { textAlign: "right" }]}>
+              {hours}.{minutes}
+            </Text>
+          </View>
+        </View>
+        // <View
+        //   key={index}
+        //   style={[
+        //     styles.boxCard,
+        //     {
+        //       backgroundColor: item.type === "user" ? Color.primary : "#808080",
+        //     },
+        //   ]}
+        // >
+        //   <Text style={styles.fontCard}>{text}</Text>
+        //   <Text style={[styles.fontCard, { textAlign: "right" }]}>
+        //     {hours}.{minutes}
+        //   </Text>
+        // </View>
+      ));
+    }
     return data.map((text, index) => (
       <View
         key={index}
@@ -98,60 +166,59 @@ const CardUser = ({ item }) => {
       //   </Text>
       // </View>
     ));
-  } else {
-    return (
-      // <View
-      //   style={[
-      //     styles.boxCard,
-      //     { backgroundColor: item.type === "user" ? "#e0e0e0" : "#fff" },
-      //   ]}
-      // >
-      //   <Text style={styles.fontCard}>{item.text}</Text>
-      //   <Text style={[styles.fontCard, { textAlign: "right" }]}>
-      //     {hours}.{minutes}
-      //   </Text>
-      // </View>
+  }
+  return (
+    // <View
+    //   style={[
+    //     styles.boxCard,
+    //     { backgroundColor: item.type === "user" ? "#e0e0e0" : "#fff" },
+    //   ]}
+    // >
+    //   <Text style={styles.fontCard}>{item.text}</Text>
+    //   <Text style={[styles.fontCard, { textAlign: "right" }]}>
+    //     {hours}.{minutes}
+    //   </Text>
+    // </View>
+    <View
+      // key={index}
+      style={[
+        styles.cardWrapper,
+        { flexDirection: item.type === "user" ? "row-reverse" : "row" },
+      ]}
+    >
+      <View style={styles.imageWrapper}>
+        {item.type === "user" ? (
+          // <Image
+          //   style={styles.image}
+          //   source={{ uri: state.userInfo.user.foto }}
+          // />
+          <Bot name="user-circle" size={24} />
+        ) : (
+          <Bot name="robot" size={24} />
+        )}
+      </View>
       <View
-        // key={index}
         style={[
-          styles.cardWrapper,
-          { flexDirection: item.type === "user" ? "row-reverse" : "row" },
+          styles.boxCard,
+          styles.shadowProp,
+          // { backgroundColor: item.type === "user" ? "#fafbff" : "#fff" },
         ]}
       >
-        <View style={styles.imageWrapper}>
-          {item.type === "user" ? (
-            // <Image
-            //   style={styles.image}
-            //   source={{ uri: state.userInfo.user.foto }}
-            // />
-            <Bot name="user-circle" size={24} />
-          ) : (
-            <Bot name="robot" size={24} />
-          )}
-        </View>
-        <View
+        <Text
           style={[
-            styles.boxCard,
-            styles.shadowProp,
-            // { backgroundColor: item.type === "user" ? "#fafbff" : "#fff" },
+            styles.fontCard,
+            { color: item.type === "user" ? Color.primary : "#000" },
+            { fontWeight: item.type === "user" ? "bold" : "normal" },
           ]}
         >
-          <Text
-            style={[
-              styles.fontCard,
-              { color: item.type === "user" ? Color.primary : "#000" },
-              { fontWeight: item.type === "user" ? "bold" : "normal" },
-            ]}
-          >
-            {item.text}
-          </Text>
-          <Text style={[styles.fontCard, { textAlign: "right" }]}>
-            {hours}.{minutes}
-          </Text>
-        </View>
+          {item.text}
+        </Text>
+        <Text style={[styles.fontCard, { textAlign: "right" }]}>
+          {hours}.{minutes}
+        </Text>
       </View>
-    );
-  }
+    </View>
+  );
 };
 
 const ChatBot = () => {
@@ -160,15 +227,21 @@ const ChatBot = () => {
   const [pertanyaan, setPertanyaan] = useState();
   // const [nomor, setNomor] = useState();
   const [userType, setUserType] = useState("");
-  // const [userType2, setUserType2] = useState();
+  const [prevuserType, setPrevuserType] = useState("");
   // const [query, setQuery] = useState();
-
+  const router = useRouter();
   const [data, setData] = useState([]);
   // const [jawabanQuery, setJawabanQuery] = useState();
   const [loading, setLoading] = useState(false);
 
   const refInput = useRef();
-  // const prevNomor = usePrevious(nomor);
+  const refPrevUserType = useRef();
+  // useEffect(() => {
+  //   // const prevNomor = usePrevious(nomor);
+  //   // console.log("type User :", userType);
+  //   // console.log("prev type User :", refPrevUserType.current);
+  // }, [userType]);
+
   const getPertanyaan = async () => {
     // console.log("token", token);
     console.log("mulai");
@@ -185,7 +258,7 @@ const ChatBot = () => {
         }
       );
       const result = await response.json();
-      console.log("hasil", result);
+      // console.log("hasil", result);
       // console.log("Bengkel =", result.data);
       setPertanyaan(result.data);
       setLoading(false);
@@ -207,40 +280,63 @@ const ChatBot = () => {
 
   //   return ref.current;
   // }
+  // useEffect(() => {
+  //   setPrevuserType(userType);
+  // }, [userType]);
   const handleKirim = async () => {
     setLoading(true);
-    // if (userType) {
-    //   setUserType2(nomor);
-    // }else{
-    //   setUserType(nomor);
-    // }
-
-    // console.log("usertype : ", userType);
+    if (userType == 9) {
+      setPrevuserType("");
+      setData([]);
+      getPertanyaan();
+      refInput.current.clear();
+      return;
+    }
+    if (userType == 0) {
+      refInput.current.clear();
+      setData([]);
+      setPrevuserType("");
+      router.back();
+      return;
+    }
+    if (!prevuserType) {
+      setPrevuserType(userType);
+    }
     refInput.current.clear();
+    let url1 = `http://192.168.43.175:8000/api/v1/jawaban/${userType}`;
+    let url2 = `http://192.168.43.175:8000/api/v1/jawaban/${prevuserType}/${userType}`;
     try {
-      const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/jawaban/${userType}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(prevuserType ? url2 : url1, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const resultFetch = await response.json();
 
       console.log("rsult", resultFetch);
+
       const textResult = !resultFetch.data.length
         ? "Data tidak ditemukan. Pastikan yang anda ketikan sesuai dengan yang ada dimenu!"
         : resultFetch.data.map((item) => item.isi_jawaban);
-      console.log("jawaban", textResult);
 
-      // console.log("Bengkel =", resultFetch.data);
+      const dataLokasiBengkel = !resultFetch.data.length
+        ? "Data tidak ditemukan. Pastikan yang anda ketikan sesuai dengan yang ada dimenu!"
+        : resultFetch.data.map((item) => item);
+      // console.log("jawaban", textResult);
+
+      console.log("Bengkel =", dataLokasiBengkel);
+
+      console.log("text result : ", textResult);
       setData([
         ...data,
         { type: "user", text: userType },
-        { type: "bot", text: textResult },
+        {
+          type: "bot",
+          text: prevuserType ? dataLokasiBengkel : textResult,
+          url: prevuserType ? 2 : "",
+        },
       ]);
       setUserType("");
       setLoading(false);
@@ -269,12 +365,33 @@ const ChatBot = () => {
           ))}
         <Card
           text={
-            "Silahkan ketikan angka yang tersedia. Untuk memunculkan informasi yang dibutuhkan. "
+            'Silahkan ketikan angka yang tersedia. Untuk memunculkan informasi yang dibutuhkan. Jika ingin mengakhiri Percakapan Ketikan angka "0"! '
           }
         />
         {/* {userType ? <CardUser text={userType} /> : ""} */}
         {data &&
           data.map((item, index) => <CardUser key={index} item={item} />)}
+        {prevuserType ? (
+          <Card
+            text={
+              'Ketik angka "9" jika ingin kembali ke-menu awal! Ketik angka "0" Jika ingin mengakhiri chatbot!'
+            }
+          />
+        ) : (
+          ""
+        )}
+        {prevuserType
+          ? userType == 9
+            ? pertanyaan &&
+              pertanyaan.map((item, index) => (
+                <Card key={index} text={item.nama_pertanyaan} />
+              ))
+            : ""
+          : ""}
+        <Text>Type : {userType}</Text>
+        <Text style={{ marginBottom: 20 }}>
+          Prev User Type : {prevuserType}
+        </Text>
         {/* {userType2 ? <CardUser text={userType2} /> : ""} */}
       </ScrollView>
       <View style={styles.bottom}>
