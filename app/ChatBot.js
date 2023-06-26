@@ -111,6 +111,39 @@ const CardUser = ({ item }) => {
         // </View>
       ));
     }
+    if (item.url == 3 || item.url == 4) {
+      return data.map((text, index) => (
+        <View
+          key={index}
+          style={[
+            styles.cardWrapper,
+            { flexDirection: item.type === "user" ? "row-reverse" : "row" },
+          ]}
+        >
+          <View style={styles.imageWrapper}>
+            {item.type === "user" ? (
+              <Bot name="user-circle" size={24} />
+            ) : (
+              <Bot name="robot" size={24} />
+            )}
+          </View>
+          <View style={[styles.boxCard, styles.shadowProp]}>
+            <Text
+              style={[
+                styles.fontCard,
+                { color: item.type === "user" ? Color.primary : "#000" },
+                { fontWeight: item.type === "user" ? "bold" : "normal" },
+              ]}
+            >
+              {text.name}
+            </Text>
+            <Text style={[styles.fontCard, { textAlign: "right" }]}>
+              {hours}.{minutes}
+            </Text>
+          </View>
+        </View>
+      ));
+    }
     return data.map((text, index) => (
       <View
         key={index}
@@ -151,34 +184,9 @@ const CardUser = ({ item }) => {
           </Text>
         </View>
       </View>
-      // <View
-      //   key={index}
-      //   style={[
-      //     styles.boxCard,
-      //     {
-      //       backgroundColor: item.type === "user" ? Color.primary : "#808080",
-      //     },
-      //   ]}
-      // >
-      //   <Text style={styles.fontCard}>{text}</Text>
-      //   <Text style={[styles.fontCard, { textAlign: "right" }]}>
-      //     {hours}.{minutes}
-      //   </Text>
-      // </View>
     ));
   }
   return (
-    // <View
-    //   style={[
-    //     styles.boxCard,
-    //     { backgroundColor: item.type === "user" ? "#e0e0e0" : "#fff" },
-    //   ]}
-    // >
-    //   <Text style={styles.fontCard}>{item.text}</Text>
-    //   <Text style={[styles.fontCard, { textAlign: "right" }]}>
-    //     {hours}.{minutes}
-    //   </Text>
-    // </View>
     <View
       // key={index}
       style={[
@@ -188,10 +196,6 @@ const CardUser = ({ item }) => {
     >
       <View style={styles.imageWrapper}>
         {item.type === "user" ? (
-          // <Image
-          //   style={styles.image}
-          //   source={{ uri: state.userInfo.user.foto }}
-          // />
           <Bot name="user-circle" size={24} />
         ) : (
           <Bot name="robot" size={24} />
@@ -236,12 +240,36 @@ const ChatBot = () => {
 
   const refInput = useRef();
   const refPrevUserType = useRef();
-  // useEffect(() => {
-  //   // const prevNomor = usePrevious(nomor);
-  //   // console.log("type User :", userType);
-  //   // console.log("prev type User :", refPrevUserType.current);
-  // }, [userType]);
 
+  const LayananTersedia = [
+    { name: "Service Mesin.", id: 1 },
+    { name: "Tambal Ban.", id: 2 },
+    { name: "Service CVT.", id: 3 },
+    { name: "Ganti Oli Mesin.", id: 4 },
+    { name: "Ganti Kampas Rem.", id: 5 },
+    { name: "Service Kelistrikan Motor.", id: 6 },
+    {
+      name: 'Ketik angka "9" jika ingin kembali ke-menu awal! Ketik angka "0" Jika ingin mengakhiri chatbot!',
+      id: 6,
+    },
+  ];
+
+  const PetunjukPemesanan = [
+    { id: 1, name: '"1" Pilih Bengkel yang tersedia.' },
+    {
+      id: 2,
+      name: '"2" Lalu tekan tombol Hubungi pada halaman detail bengkel untuk melanjutkan pemesanan.',
+    },
+    {
+      id: 3,
+      name: '"3" Berikan keluhan melalui chat dan informasi yang akurat.',
+    },
+    { id: 4, name: '"4" Jika sudah montir akan mendatangi anda.' },
+    {
+      name: 'Ketik angka "9" jika ingin kembali ke-menu awal! Ketik angka "0" Jika ingin mengakhiri chatbot!',
+      id: 6,
+    },
+  ];
   const getPertanyaan = async () => {
     // console.log("token", token);
     console.log("mulai");
@@ -258,8 +286,7 @@ const ChatBot = () => {
         }
       );
       const result = await response.json();
-      // console.log("hasil", result);
-      // console.log("Bengkel =", result.data);
+
       setPertanyaan(result.data);
       setLoading(false);
       console.log("selesai");
@@ -271,24 +298,42 @@ const ChatBot = () => {
   useEffect(() => {
     getPertanyaan();
   }, []);
-  // function usePrevious(value) {
-  //   const ref = useRef();
 
-  //   useEffect(() => {
-  //     ref.current = value;
-  //   });
-
-  //   return ref.current;
-  // }
-  // useEffect(() => {
-  //   setPrevuserType(userType);
-  // }, [userType]);
   const handleKirim = async () => {
     setLoading(true);
     if (userType == 9) {
       setPrevuserType("");
       setData([]);
       getPertanyaan();
+      refInput.current.clear();
+      return;
+    }
+    if (userType == 3) {
+      // setPrevuserType("");
+      // setData([]);
+      setData([
+        ...data,
+        { type: "user", text: userType },
+        {
+          type: "bot",
+          text: LayananTersedia,
+          url: 3,
+        },
+      ]);
+      // getPertanyaan();
+      refInput.current.clear();
+      return;
+    }
+    if (userType == 4) {
+      setData([
+        ...data,
+        { type: "user", text: userType },
+        {
+          type: "bot",
+          text: PetunjukPemesanan,
+          url: 4,
+        },
+      ]);
       refInput.current.clear();
       return;
     }
@@ -388,11 +433,6 @@ const ChatBot = () => {
               ))
             : ""
           : ""}
-        <Text>Type : {userType}</Text>
-        <Text style={{ marginBottom: 20 }}>
-          Prev User Type : {prevuserType}
-        </Text>
-        {/* {userType2 ? <CardUser text={userType2} /> : ""} */}
       </ScrollView>
       <View style={styles.bottom}>
         <View style={styles.boxInput}>
@@ -407,9 +447,6 @@ const ChatBot = () => {
           <TouchableOpacity style={styles.button} onPress={() => handleKirim()}>
             <Text style={styles.textButton}>Kirim</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Bottom Button</Text>
-        </TouchableOpacity> */}
         </View>
       </View>
     </View>
@@ -431,9 +468,6 @@ const styles = StyleSheet.create({
     width: "15%",
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "#fff",
-    // borderRadius: "50%",
-    // gap: 10,
   },
   iconImage: {},
   bottom: {
@@ -442,13 +476,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     height: 60,
   },
-  // button: {
-  //   width: "100%",
-  //   height: 50,
-  //   backgroundColor: "red",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // },
+
   image: {
     width: 30,
   },
