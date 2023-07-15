@@ -69,6 +69,15 @@ export default Layout = () => {
             tabBarLabel: "Explore",
           }}
         />
+        {/* <Tabs.Screen
+          name="MapScreen"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Explore name="explore" color={color} size={24} />
+            ),
+            tabBarLabel: "Explore",
+          }}
+        /> */}
         <Tabs.Screen
           name="TransaksiScreen"
           options={{

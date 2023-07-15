@@ -11,7 +11,12 @@ import {
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import { useRouter, Link } from "expo-router";
-import { useStateContext, getUserInfo, getUserToken } from "./../hooks/Store";
+import {
+  useStateContext,
+  getUserInfo,
+  getUserToken,
+  baseUrl,
+} from "./../hooks/Store";
 import Color from "../constants/Color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
@@ -80,16 +85,13 @@ const HomeScreen = () => {
     // console.log("token", token);
     setLoading(true);
     try {
-      const response = await fetch(
-        "http://192.168.43.175:8000/api/v1/bengkel/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/bengkel`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const result = await response.json();
       // console.log("Bengkel =", result.data);
       setData(result.data);

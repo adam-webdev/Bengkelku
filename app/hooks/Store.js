@@ -6,7 +6,7 @@ import React, {
   createContext,
   useEffect,
 } from "react";
-
+export const baseUrl = "http://192.168.43.175:8000/api/v1";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 export const getUserInfo = async () => {

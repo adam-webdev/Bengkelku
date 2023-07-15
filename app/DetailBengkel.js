@@ -11,7 +11,7 @@ import * as Linking from "expo-linking";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter, Stack } from "expo-router";
 // import { Stack } from "expo-router";
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, baseUrl } from "./hooks/Store";
 import Color from "./constants/Color";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Foundation from "@expo/vector-icons/Foundation";
@@ -31,16 +31,13 @@ const DetailBengkel = ({ navigation }) => {
   const getDetailBengkel = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/bengkel/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/bengkel/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const result = await response.json();
       console.log("Bengkel =", result.data);
       setData(result.data);
@@ -52,6 +49,15 @@ const DetailBengkel = ({ navigation }) => {
   useEffect(() => {
     getDetailBengkel();
   }, []);
+
+  const handleOrder = async () => {
+    setLoding(true);
+    try {
+      const resOrder = await fetch();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");
   const kota = useDaerah(data?.kota_id, "kota");
@@ -193,19 +199,29 @@ const DetailBengkel = ({ navigation }) => {
               </Text>
             </View>
             <TouchableOpacity
-              style={styles.linkChatbot}
-              onPress={() => router.push("/ChatBot")}
+              style={styles.linkPesan}
+              onPress={() => handleOrder()}
             >
-              <Chatbot color={"#fff"} size={30} name="headset" />
-              <Text style={styles.textChatbot}>ChatBot</Text>
+              {/* <Chatbot color={"#fff"} size={30} name="headset" /> */}
+              <Text style={styles.textChatbot}>Pesan</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.linkChatbot, { backgroundColor: "green" }]}
-              onPress={() => sendWhatsApp(data?.no_hp)}
-            >
-              <Whatsapp color={"#fff"} size={30} name="whatsapp" />
-              <Text style={styles.textChatbot}>Hubungi</Text>
-            </TouchableOpacity>
+
+            <View style={styles.buttonChat}>
+              <TouchableOpacity
+                style={styles.linkChatbot}
+                onPress={() => router.push("/ChatBot")}
+              >
+                <Chatbot color={"#fff"} size={30} name="headset" />
+                <Text style={styles.textChatbot}>ChatBot</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.linkChatbot, { backgroundColor: "green" }]}
+                onPress={() => sendWhatsApp(data?.no_hp)}
+              >
+                <Whatsapp color={"#fff"} size={30} name="whatsapp" />
+                <Text style={styles.textChatbot}>Hubungi</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -257,6 +273,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   linkChatbot: {
+    width: "48%",
     backgroundColor: Color.secondaryColor,
     flexDirection: "row",
     alignItems: "center",
@@ -265,6 +282,21 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginTop: 10,
     padding: 8,
+  },
+  linkPesan: {
+    backgroundColor: Color.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    borderRadius: 6,
+    marginTop: 10,
+    padding: 8,
+  },
+  buttonChat: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   textChatbot: {
     fontSize: 18,

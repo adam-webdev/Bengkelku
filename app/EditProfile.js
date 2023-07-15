@@ -14,7 +14,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useLocalSearchParams, useRouter } from "expo-router";
 import { Stack } from "expo-router";
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, baseUrl } from "./hooks/Store";
 import Color from "./constants/Color";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Foundation from "@expo/vector-icons/Foundation";
@@ -66,16 +66,13 @@ const EditProfile = ({ navigation }) => {
   const getDetailProfil = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/user/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/user/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const result = await response.json();
       console.log("profil =", result.data);
       setData(result.data);
@@ -136,21 +133,18 @@ const EditProfile = ({ navigation }) => {
     try {
       console.log("form-data", formData);
       console.log("mulai");
-      const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/user/${id}`,
-        {
-          headers: {
-            // "Content-Type": "application/json",
-            // "Content-Type": "multipart/form-data",
-            Authorization: "Bearer " + state?.userInfo?.token,
-            // "Content-Type":
-            //   "multipart/form-data; charset=utf-8; boundary=" +
-            //   Math.random().toString().substr(2),
-          },
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${baseUrl}/user/${id}`, {
+        headers: {
+          // "Content-Type": "application/json",
+          // "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + state?.userInfo?.token,
+          // "Content-Type":
+          //   "multipart/form-data; charset=utf-8; boundary=" +
+          //   Math.random().toString().substr(2),
+        },
+        method: "POST",
+        body: formData,
+      });
       console.log("selesai", response);
       const result = await response.json();
       console.log("resultan", result);

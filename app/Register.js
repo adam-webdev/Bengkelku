@@ -16,7 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
-import { useStateContext, storeData } from "./hooks/Store";
+import { useStateContext, storeData, baseUrl } from "./hooks/Store";
 
 const Register = () => {
   const router = useRouter();
@@ -44,22 +44,19 @@ const Register = () => {
     //   return;
     // }
     try {
-      const response = await fetch(
-        "http://192.168.43.175:8000/api/v1/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "Application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            no_hp: nohp,
-            password,
-            // confirm_password: confirmPassword,
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          no_hp: nohp,
+          password,
+          // confirm_password: confirmPassword,
+        }),
+      });
       const result = await response.json();
       if (result?.success) {
         console.log("hasil ", result);

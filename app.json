@@ -12,6 +12,13 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsImpl": "maplibre",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xrM2ZvZHkzMHN5NzNmcnlzN3Blcm9sbCJ9.0IvN9wlpXj1z1k9wIJdyNQ"
+        }
       ]
     ],
     "scheme": "acme",
@@ -22,7 +29,6 @@
     "slug": "Bengkelku",
     "android": {
       "usesCleartextTraffic": true
-      // "softwareKeyboardLayoutMode": "pan"
     }
   }
 }

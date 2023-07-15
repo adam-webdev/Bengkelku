@@ -10,7 +10,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "expo-router";
 import { Stack } from "expo-router";
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, baseUrl } from "./hooks/Store";
 import Color from "./constants/Color";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Foundation from "@expo/vector-icons/Foundation";
@@ -28,16 +28,13 @@ const DetailProfil = ({ navigation }) => {
   const getDetailProfil = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://192.168.43.175:8000/api/v1/user/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/user/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const result = await response.json();
       console.log("profil =", result.data);
       setData(result.data);
