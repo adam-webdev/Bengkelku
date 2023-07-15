@@ -100,7 +100,7 @@ const HomeScreen = () => {
       console.log(err);
     }
   };
-
+  console.log(state.userInfo.user);
   useEffect(() => {
     getDataBengkel();
   }, []);

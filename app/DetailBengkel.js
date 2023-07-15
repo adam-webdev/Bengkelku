@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import * as Linking from "expo-linking";
 import React, { useState, useEffect } from "react";
@@ -20,11 +21,13 @@ import useDaerah from "./hooks/useDaerah";
 import useToken from "./hooks/useToken";
 import Chatbot from "@expo/vector-icons/FontAwesome5";
 import Whatsapp from "@expo/vector-icons/FontAwesome";
+import { showAlert } from "./components/Alert";
 
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingOrder, setLoadingOrder] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
   const router = useRouter();
@@ -49,16 +52,50 @@ const DetailBengkel = ({ navigation }) => {
   useEffect(() => {
     getDetailBengkel();
   }, []);
+  // console.log(state.userLocation);
+  const dataOrder = {
+    user_id: state.userInfo.user.id,
+    bengkel_id: id,
+    lng: state.userLocation.longitude,
+    lat: state.userLocation.latitude,
+  };
+  const showAlert = () => {
+    Alert.alert("Pemesanan Berhasil", [
+      {
+        text: "Cancel",
+        onPress: () => Alert.alert("ok"),
+        style: "success",
+      },
+    ]);
+  };
 
   const handleOrder = async () => {
-    setLoding(true);
+    // const user_id = state.userInfo.user.id;
+    // const bengkel_id = id;
+    setLoadingOrder(true);
+
     try {
-      const resOrder = await fetch();
+      const responseOrder = await fetch(`${baseUrl}/order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+        body: JSON.stringify(dataOrder),
+      });
+      console.log("data order :", dataOrder);
+      console.log("selesai");
+      const resultOrder = await responseOrder.json();
+      console.log(resultOrder);
+      setLoadingOrder(false);
+      // showAlert();
+      router.push("/home/HomeScreen");
     } catch (err) {
-      console.log(err);
+      console.log("err", err);
     }
   };
 
+  console.log("lodaing order ", loadingOrder);
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");
   const kota = useDaerah(data?.kota_id, "kota");
 
@@ -201,9 +238,20 @@ const DetailBengkel = ({ navigation }) => {
             <TouchableOpacity
               style={styles.linkPesan}
               onPress={() => handleOrder()}
+              disabled={loadingOrder}
             >
-              {/* <Chatbot color={"#fff"} size={30} name="headset" /> */}
-              <Text style={styles.textChatbot}>Pesan</Text>
+              {loadingOrder ? (
+                <ActivityIndicator
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  size="large"
+                  color={Color.primary}
+                />
+              ) : (
+                <Text style={styles.textChatbot}>Pesan</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.buttonChat}>

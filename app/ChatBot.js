@@ -11,7 +11,7 @@ import {
 import Color from "./constants/Color";
 import Bot from "@expo/vector-icons/FontAwesome5";
 
-import { useStateContext } from "./hooks/Store";
+import { useStateContext, baseUrl } from "./hooks/Store";
 import { useRouter } from "expo-router";
 
 const Card = ({ text }) => {
@@ -275,16 +275,13 @@ const ChatBot = () => {
     console.log("mulai");
     setLoading(true);
     try {
-      const response = await fetch(
-        "http://192.168.43.175:8000/api/v1/pertanyaan/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/pertanyaan`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
       const result = await response.json();
 
       setPertanyaan(result.data);
@@ -348,8 +345,8 @@ const ChatBot = () => {
       setPrevuserType(userType);
     }
     refInput.current.clear();
-    let url1 = `http://192.168.43.175:8000/api/v1/jawaban/${userType}`;
-    let url2 = `http://192.168.43.175:8000/api/v1/jawaban/${prevuserType}/${userType}`;
+    let url1 = `${baseUrl}/jawaban/${userType}`;
+    let url2 = `${baseUrl}/jawaban/${prevuserType}/${userType}`;
     try {
       const response = await fetch(prevuserType ? url2 : url1, {
         method: "GET",

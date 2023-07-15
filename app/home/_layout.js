@@ -84,7 +84,7 @@ export default Layout = () => {
             tabBarIcon: ({ color }) => (
               <Transaksi name="exchange-alt" color={color} size={24} />
             ),
-            tabBarLabel: "Transaksi",
+            tabBarLabel: "Order",
           }}
         />
         {/* <Tabs.Screen

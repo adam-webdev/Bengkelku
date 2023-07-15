@@ -15,7 +15,7 @@ import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
-import { useStateContext, storeData } from "./hooks/Store";
+import { useStateContext, storeData, baseUrl } from "./hooks/Store";
 
 const Login = () => {
   const router = useRouter();
@@ -39,7 +39,7 @@ const Login = () => {
     console.log("email", email);
     console.log("password", password);
     try {
-      const response = await fetch("http://192.168.43.175:8000/api/v1/login", {
+      const response = await fetch(`${baseUrl}/login`, {
         headers: {
           "Content-Type": "application/json",
         },
