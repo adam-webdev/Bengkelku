@@ -8,10 +8,16 @@ import {
   ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  useNavigation,
+  useRouter,
+  useLocalSearchParams,
+  Link,
+  Stack,
+} from "expo-router";
 
 import React, { useState, useEffect } from "react";
 import Color from "./constants/Color";
-import { Link, useRouter, Stack } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // import ArrowLeft from "@expo/vector-icons/AntDesign";
 import useTogglePasswordVisibility from "./hooks/useTogglePasswordVisibility";
@@ -27,7 +33,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [data, setData] = useState([]);
-
+  const params = useLocalSearchParams();
   const focusHandle = () => {
     if (error) {
       setError(false);
@@ -60,6 +66,7 @@ const Login = () => {
       } else {
         console.log("error", result.message);
         setError(true);
+        ``;
         setData(result.message);
         setLoading(false);
       }
@@ -73,9 +80,8 @@ const Login = () => {
 
     // console.log(SecureStore.getItemAsync("userInfo"));
   };
-  // useEffect(() => {
-  //   handleLogin();
-  // }, []);
+  // console.log("data params", params?.data?.user);
+  useEffect(() => {}, []);
   return (
     <ScrollView style={styles.wrapper}>
       <View style={styles.container}>
@@ -95,12 +101,7 @@ const Login = () => {
         <View>
           <Text style={styles.font1}>Silahkan Login </Text>
         </View>
-        <View style={{ color: "red" }}>
-          {/* <Text style={styles.textError}>
-          { data.data?.message.password : ""}
-        </Text>
-        <Text style={styles.textError}>{error ? data.data?.message : ""}</Text> */}
-        </View>
+        <View style={{ color: "red" }}></View>
         <View>
           <TextInput
             onFocus={() => focusHandle()}

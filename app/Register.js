@@ -61,12 +61,12 @@ const Register = () => {
       if (result?.success) {
         console.log("hasil ", result);
         setData(result.data.user);
-        await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
-        dispatch({ type: "LOGIN", payload: result?.data });
+        // await AsyncStorage.setItem("userInfo", JSON.stringify(result.data));
+        // dispatch({ type: "LOGIN", payload: result?.data });
         setLoading(false);
-        router.replace("/home/HomeScreen");
+        router.push("/Login");
       } else {
-        console.log("error result", result.message);
+        console.log("error esult", result.message);
         setError(true);
         setData(result?.message);
         setLoading(false);

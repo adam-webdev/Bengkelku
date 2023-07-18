@@ -66,7 +66,11 @@ const TransaksiScreen = () => {
       <ScrollView>
         <View style={styles.container}>
           {data?.map((item, index) => (
-            <TouchableOpacity style={{ gap: 8 }} key={index}>
+            <TouchableOpacity
+              style={{ gap: 8 }}
+              key={index}
+              onPress={() => router.push("/DetailOrder/?id=" + item.id)}
+            >
               <View style={styles.box}>
                 <View style={{ gap: 8 }}>
                   <Text style={styles.name}>ORDERB3N600{item?.id}</Text>

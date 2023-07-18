@@ -144,7 +144,7 @@ const HomeScreen = () => {
 
   // console.log("lokasi", location);
   // console.log("home =>", state?.userInfo);
-  // console.log("user location =>", state?.userLocation);
+  console.log("user location =>", state?.userLocation);
   // console.log("roles =>", state?.userInfo?.user?.roles[0]?.name);
   // console.log(state?.user);
   if (loading) {

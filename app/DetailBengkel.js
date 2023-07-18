@@ -56,18 +56,28 @@ const DetailBengkel = ({ navigation }) => {
   const dataOrder = {
     user_id: state.userInfo.user.id,
     bengkel_id: id,
+    admin_bengkel: data?.user_id,
     lng: state.userLocation.longitude,
     lat: state.userLocation.latitude,
   };
-  const showAlert = () => {
-    Alert.alert("Pemesanan Berhasil", [
+  const showAlert = () =>
+    Alert.alert("Berhasil", "Pesanan anda telah terkirim", [
+      // {
+      //   text: "OK",
+      //   onPress: () => Alert.alert("ok"),
+      //   style: "OK",
+      // },
       {
-        text: "Cancel",
-        onPress: () => Alert.alert("ok"),
-        style: "success",
+        text: "tutup",
+        onPress: async () => {
+          try {
+            router.push("/home/HomeScreen");
+          } catch (error) {
+            console.log("logout error", error);
+          }
+        },
       },
     ]);
-  };
 
   const handleOrder = async () => {
     // const user_id = state.userInfo.user.id;
@@ -88,8 +98,9 @@ const DetailBengkel = ({ navigation }) => {
       const resultOrder = await responseOrder.json();
       console.log(resultOrder);
       setLoadingOrder(false);
-      // showAlert();
-      router.push("/home/HomeScreen");
+      return showAlert();
+
+      // router.push("/home/HomeScreen");
     } catch (err) {
       console.log("err", err);
     }
@@ -168,9 +179,10 @@ const DetailBengkel = ({ navigation }) => {
             <Text style={{ fontSize: 18, fontWeight: "bold" }}>
               {data?.nama_bengkel}
             </Text>
-            <Text>
+            <Text style={{ fontSize: 16 }}>{data?.deskripsi ?? "-"}</Text>
+            {/* <Text>
               {kota.name}, {provinsi.name}
-            </Text>
+            </Text> */}
             <Text
               style={{
                 fontSize: 16,
