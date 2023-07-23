@@ -17,6 +17,7 @@ import {
   getUserToken,
   baseUrl,
 } from "./../hooks/Store";
+const haversine = require("haversine");
 import Color from "../constants/Color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
@@ -24,53 +25,73 @@ import * as Location from "expo-location";
 import useDaerah from "./../hooks/useDaerah";
 import useToken from "./../hooks/useToken";
 const Card = ({ item }) => {
+  const { state, dispatch } = useStateContext();
+
   const router = useRouter();
   const provinsi = useDaerah(item.provinsi_id, "provinsi");
   const kota = useDaerah(item.kota_id, "kota");
   const kecamatan = useDaerah(item.kecamatan_id, "kecamatan");
   const desa = useDaerah(item.desa_id, "desa");
-  return (
-    // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
-    <TouchableOpacity
-      onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
-    >
-      <View
-        style={{
-          backgroundColor: "#fff",
-          padding: 10,
-          flexDirection: "row",
-          gap: 10,
-          alignItems: "center",
-          borderRadius: 10,
-          // borderWidth: 1,
-          // borderColor: "grey",
-        }}
+
+  const start = {
+    latitude: state?.userLocation?.latitude,
+    longitude: state?.userLocation?.longitude,
+  };
+  const end = {
+    latitude: item?.latitude,
+    longitude: item?.longitude,
+  };
+
+  if (haversine(start, end, { unit: "km" }) <= 20) {
+    return (
+      // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
+
+      <TouchableOpacity
+        onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
       >
-        {item?.foto_bengkel ? (
-          <Image
-            style={styles.imageBanner}
-            resizeMode="cover"
-            source={{ uri: item?.foto_bengkel }}
-          />
-        ) : (
-          <Image
-            style={styles.imageBanner}
-            resizeMode="cover"
-            source={require("../../assets/banner/banner.png")}
-          />
-        )}
-        <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            {item.nama_bengkel}
-          </Text>
-          <Text style={{ fontSize: 12 }}>
-            {kota?.name},\n {provinsi?.name}
-          </Text>
-          <Text style={{ color: "grey", fontSize: 12 }}>Jarak 100 meter</Text>
+        <View
+          style={[
+            styles.elevation,
+            {
+              backgroundColor: "#fff",
+              padding: 10,
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+              borderRadius: 10,
+              // borderWidth: 1,
+              // borderColor: "grey",
+            },
+          ]}
+        >
+          {item?.foto_bengkel ? (
+            <Image
+              style={styles.imageBanner}
+              resizeMode="cover"
+              source={{ uri: item?.foto_bengkel }}
+            />
+          ) : (
+            <Image
+              style={styles.imageBanner}
+              resizeMode="cover"
+              source={require("../../assets/banner/banner.png")}
+            />
+          )}
+          <View style={{ gap: 8 }}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              {item.nama_bengkel}
+            </Text>
+            <Text style={{ fontSize: 12 }}>
+              {kota?.name},\n {provinsi?.name}
+            </Text>
+            <Text style={{ fontSize: 12 }}>
+              Jarak {Math.round(haversine(start, end, { unit: "km" }))} km
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  }
 };
 const HomeScreen = () => {
   const [data, setData] = useState([]);
@@ -158,7 +179,7 @@ const HomeScreen = () => {
   }
   // const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <StatusBar />
       <View style={styles.banner}>
         <Text style={styles.judul}>
@@ -193,7 +214,7 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#e3e2de",
     paddingVertical: 10,
     paddingHorizontal: 10,
   },
@@ -221,5 +242,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginHorizontal: 20,
     borderRadius: 50,
+  },
+  elevation: {
+    elevation: 20,
+    shadowColor: "#9e9e9e",
   },
 });

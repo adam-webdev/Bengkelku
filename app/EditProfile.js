@@ -39,7 +39,27 @@ const EditProfile = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [telp, setTelp] = useState();
   const [jenisKelamin, setJenisKelamin] = useState();
-  const jenis_kelamin = ["Laki-laki", "Perempuan"];
+  const jenis_kelamin = [
+    "Laki-laki",
+    "Perempuan",
+    "asadfaef",
+    "asadfasf",
+    "dasafdfaa",
+    "Fdsfa",
+    "dasfaeaftew",
+    "et43534",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+    "y5y5y",
+  ];
   const router = useRouter();
   // const { nameParams, emialParams, telpParams } = params;
   const pickImage = async () => {
@@ -234,10 +254,27 @@ const EditProfile = ({ navigation }) => {
               </TouchableOpacity>
             </>
           ) : (
-            <Image
-              style={styles.image}
-              source={require("../assets/img/bengkel.jpg")}
-            />
+            <>
+              <Image
+                style={styles.image}
+                source={require("../assets/img/bengkel.jpg")}
+              />
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: Color.primary,
+                  padding: 8,
+                  borderRadius: 4,
+                  gap: 3,
+                  marginTop: 6,
+                }}
+                onPress={() => pickImage()}
+              >
+                <FontAwesome name="camera" color={"#fff"} size={18} />
+                <Text style={{ color: "#fff" }}>Ubah Foto</Text>
+              </TouchableOpacity>
+            </>
           )}
           {data?.name ? (
             <View style={{ flexDirection: "row", alignItems: "center" }}>

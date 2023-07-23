@@ -13,11 +13,11 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ],
-      [
+       [
         "@rnmapbox/maps",
         {
-          "RNMapboxMapsImpl": "maplibre",
-          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xrM2ZvZHkzMHN5NzNmcnlzN3Blcm9sbCJ9.0IvN9wlpXj1z1k9wIJdyNQ"
+          "RNMapboxMapsImpl": "mapbox",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xrYzFoeDdsMGVhMDNlcGY4YTNzYWh6bCJ9.9H-IPTxztl2GUinnLvKg2Q"
         }
       ]
     ],
@@ -28,7 +28,27 @@
     "name": "Bengkelku",
     "slug": "Bengkelku",
     "android": {
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.adam_webdev.Bengkelku",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAuYand6-drJrEpJfHdPogNWyGevtUM5IQ"
+      }
+    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3a944bd7-5fb7-476f-85f0-adc0f1e9320d"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "no"
     }
   }
 }

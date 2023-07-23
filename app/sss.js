@@ -127,4 +127,10 @@
 //     color: "#fff",
 //     marginTop: 80,
 //   },
+//   "@rnmapbox/maps",
+//   {
+//     "RNMapboxMapsImpl": "mapbox",
+//     "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xrM2ZvZHkzMHN5NzNmcnlzN3Blcm9sbCJ9.0IvN9wlpXj1z1k9wIJdyNQ"
+//   }
+// ]
 // });

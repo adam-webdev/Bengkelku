@@ -175,7 +175,12 @@ const DetailBengkel = ({ navigation }) => {
               />
             )}
           </View>
-          <View style={{ paddingVertical: 20, paddingHorizontal: 10 }}>
+          <View
+            style={[
+              styles.cardBox,
+              { paddingVertical: 20, paddingHorizontal: 10 },
+            ]}
+          >
             <Text style={{ fontSize: 18, fontWeight: "bold" }}>
               {data?.nama_bengkel}
             </Text>
@@ -244,7 +249,7 @@ const DetailBengkel = ({ navigation }) => {
               />
               <Text style={styles.itemText}>
                 {" "}
-                {data?.alamat_lengkap}, {kota.name}, {provinsi.name}
+                {kota.name}, {provinsi.name}
               </Text>
             </View>
             <TouchableOpacity
@@ -296,14 +301,31 @@ const styles = StyleSheet.create({
     // backgroundColor: "#fff",
     // margin: 10,
     // paddingHorizontal: 10,
+    flex: 1,
     fontSize: 16,
   },
   boxImage: {
     // width: 50,
     // height: 50,
+    flex: 1,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+  },
+  cardBox: {
+    // position: "absolute",
+    // margin: 10,
+    // bottom: -300,
+    // top: 100,
+    // justifyContent: "flex-end",
+    borderRadius: 4,
+    backgroundColor: "#fff",
+    // gap: 8,
+    // shadowProp: {
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   image: {
     objectFit: "cover",
@@ -314,10 +336,8 @@ const styles = StyleSheet.create({
   itemWrapp: {
     // justifyContent: "space-between",
     flexDirection: "row",
-    paddingHorizontal: 10,
     borderRadius: 4,
     backgroundColor: "#fff",
-    paddingVertical: 10,
     // gap: 8,
     // shadowProp: {
     shadowColor: "#171717",
