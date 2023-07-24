@@ -307,7 +307,7 @@ const EditProfile = ({ navigation }) => {
           </Text>
         </View>
 
-        <View style={{ width: "100%" }}>
+        <View style={{ width: "100%", backgroundColor: "#fff" }}>
           {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
             {data?.nama_bengkel}
           </Text> */}
@@ -496,6 +496,7 @@ const styles = StyleSheet.create({
   },
   wrappButton: {
     marginTop: 15,
+    justifyContent: "flex-end",
   },
   button: {
     backgroundColor: Color.primary,

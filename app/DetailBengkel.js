@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+
 import * as Linking from "expo-linking";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter, Stack } from "expo-router";
@@ -267,26 +268,27 @@ const DetailBengkel = ({ navigation }) => {
                   color={Color.primary}
                 />
               ) : (
-                <Text style={styles.textChatbot}>Pesan</Text>
+                <>
+                  <IonIcons size={26} name="call" color="#fff" />
+                  <Text style={styles.textChatbot}>Pesan</Text>
+                </>
               )}
             </TouchableOpacity>
 
-            <View style={styles.buttonChat}>
-              <TouchableOpacity
+            {/* <TouchableOpacity
                 style={styles.linkChatbot}
                 onPress={() => router.push("/ChatBot")}
               >
                 <Chatbot color={"#fff"} size={30} name="headset" />
                 <Text style={styles.textChatbot}>ChatBot</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.linkChatbot, { backgroundColor: "green" }]}
-                onPress={() => sendWhatsApp(data?.no_hp)}
-              >
-                <Whatsapp color={"#fff"} size={30} name="whatsapp" />
-                <Text style={styles.textChatbot}>Hubungi</Text>
-              </TouchableOpacity>
-            </View>
+              </TouchableOpacity> */}
+            <TouchableOpacity
+              style={[styles.linkChatbot, { backgroundColor: "green" }]}
+              onPress={() => sendWhatsApp(data?.no_hp)}
+            >
+              <Whatsapp color={"#fff"} size={30} name="whatsapp" />
+              <Text style={styles.textChatbot}>Hubungi</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -353,7 +355,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   linkChatbot: {
-    width: "48%",
     backgroundColor: Color.secondaryColor,
     flexDirection: "row",
     alignItems: "center",

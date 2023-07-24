@@ -140,7 +140,7 @@ const DetailProfil = ({ navigation }) => {
             <Text>Bengkel Saya</Text>
           </TouchableOpacity> */}
         </View>
-        <View style={{ paddingVertical: 10, paddingHorizontal: 10 }}>
+        <View style={{ backgroundColor: "#fff" }}>
           {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
             {data?.nama_bengkel}
           </Text> */}
@@ -150,6 +150,7 @@ const DetailProfil = ({ navigation }) => {
               fontSize: 16,
               marginBottom: 5,
               fontWeight: "bold",
+              padding: 10,
             }}
           >
             Detail :
@@ -227,7 +228,7 @@ const DetailProfil = ({ navigation }) => {
           <Text
             style={{
               textAlign: "center",
-              color: Color.primary,
+              color: "#fff",
               fontSize: 18,
             }}
           >
@@ -235,7 +236,7 @@ const DetailProfil = ({ navigation }) => {
           </Text>
           <Octicons
             name="chevron-right"
-            style={{ color: Color.primary, fontSize: 20 }}
+            style={{ color: "#fff", fontSize: 20 }}
           />
         </TouchableOpacity>
       </View>
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   },
   boxImage: {
     // width: 50,
-    height: 330,
+    height: 300,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
@@ -289,16 +290,15 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   button: {
-    backgroundColor: "#fff",
+    backgroundColor: Color.primary,
     // backgroundColor: "#0000a7",
     cursor: "pointer",
-    // color: "#fff",
+    color: "#fff",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 12,
-    paddingVertical: 14,
-    marginHorizontal: 10,
+    paddingVertical: 16,
     // borderRadius: 8,
   },
 });

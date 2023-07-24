@@ -17,82 +17,14 @@ import {
   getUserToken,
   baseUrl,
 } from "./../hooks/Store";
-const haversine = require("haversine");
 import Color from "../constants/Color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 
 import useDaerah from "./../hooks/useDaerah";
 import useToken from "./../hooks/useToken";
-const Card = ({ item }) => {
-  const { state, dispatch } = useStateContext();
+import CardBengkel from "./../components/CardBengkel";
 
-  const router = useRouter();
-  const provinsi = useDaerah(item.provinsi_id, "provinsi");
-  const kota = useDaerah(item.kota_id, "kota");
-  const kecamatan = useDaerah(item.kecamatan_id, "kecamatan");
-  const desa = useDaerah(item.desa_id, "desa");
-
-  const start = {
-    latitude: state?.userLocation?.latitude,
-    longitude: state?.userLocation?.longitude,
-  };
-  const end = {
-    latitude: item?.latitude,
-    longitude: item?.longitude,
-  };
-
-  if (haversine(start, end, { unit: "km" }) <= 20) {
-    return (
-      // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
-
-      <TouchableOpacity
-        onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
-      >
-        <View
-          style={[
-            styles.elevation,
-            {
-              backgroundColor: "#fff",
-              padding: 10,
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-              borderRadius: 10,
-              // borderWidth: 1,
-              // borderColor: "grey",
-            },
-          ]}
-        >
-          {item?.foto_bengkel ? (
-            <Image
-              style={styles.imageBanner}
-              resizeMode="cover"
-              source={{ uri: item?.foto_bengkel }}
-            />
-          ) : (
-            <Image
-              style={styles.imageBanner}
-              resizeMode="cover"
-              source={require("../../assets/banner/banner.png")}
-            />
-          )}
-          <View style={{ gap: 8 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {item.nama_bengkel}
-            </Text>
-            <Text style={{ fontSize: 12 }}>
-              {kota?.name},\n {provinsi?.name}
-            </Text>
-            <Text style={{ fontSize: 12 }}>
-              Jarak {Math.round(haversine(start, end, { unit: "km" }))} km
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  }
-};
 const HomeScreen = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -100,7 +32,7 @@ const HomeScreen = () => {
   const { state, dispatch } = useStateContext();
   const [location, setLocation] = useState("");
   const router = useRouter();
-  // const token = useToken();
+  const token = useToken();
 
   const getDataBengkel = async () => {
     // console.log("token", token);
@@ -179,31 +111,42 @@ const HomeScreen = () => {
   }
   // const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
-    <ScrollView style={styles.container}>
-      <StatusBar />
-      <View style={styles.banner}>
-        <Text style={styles.judul}>
-          Selamat Datang{" "}
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-            {state?.userInfo?.user?.name}
-          </Text>
-        </Text>
-        <Image
-          style={styles.imageBanner}
-          resizeMode="cover"
-          source={require("../../assets/banner/banner.png")}
-        />
-        <TouchableOpacity style={styles.button}>
-          <Text style={{ color: "#fff", fontSize: 18 }}>Cari sekarang</Text>
-        </TouchableOpacity>
+    <ScrollView style={{ backgroundColor: "#fff" }}>
+      <View style={styles.topCard}>
+        <View style={[styles.banner, styles.elevation]}>
+          <Image
+            style={styles.imageBanner}
+            // resizeMode="cover"
+            source={require("../../assets/banner/mechanic.png")}
+          />
+          <View style={{ gap: 6 }}>
+            <Text style={styles.judul}>
+              Selamat Datang{" "}
+              <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+                {state?.userInfo?.user?.name}
+              </Text>
+            </Text>
+            <Text style={{ fontSize: 16, color: "#3e3e3e" }}>
+              Kami siap melayani anda
+            </Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push("/home/ExploreScreen")}
+            >
+              <Text
+                style={{ color: "#fff", fontSize: 18, textAlign: "center" }}
+              >
+                Cari sekarang >>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-
-      <View style={{ padding: 10, gap: 10 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          Rekomendasi untuk anda :
-        </Text>
+      <View style={styles.container}>
+        <Text style={{ fontSize: 16 }}>Rekomendasi :</Text>
+        {/* <StatusBar /> */}
         {data?.map((item, index) => {
-          return <Card key={index} item={item} />;
+          return <CardBengkel explore="false" item={item} key={index} />;
         })}
       </View>
     </ScrollView>
@@ -214,37 +157,54 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#e3e2de",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    marginTop: 70,
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    position: "relative",
+    gap: 10,
   },
   banner: {
+    flexDirection: "row",
     backgroundColor: "#fff",
-    paddingVertical: 10,
-    justifyContent: "center",
+    // justifyContent: "center",
     alignItems: "center",
+    position: "absolute",
+    // marginTop: -80,
+    width: "90%",
+    borderRadius: 20,
+    gap: 20,
+    top: 8,
+    padding: 10,
   },
   judul: {
-    fontSize: 16,
+    fontSize: 18,
   },
   imageBanner: {
-    width: 100,
+    width: 80,
     objectFit: "cover",
-    height: 100,
+    height: 80,
     borderRadius: 10,
   },
   button: {
-    justifyContent: "center",
-    alignItem: "center",
     paddingVertical: 10,
-    paddingHorizontal: 34,
+    textAlign: "center",
     backgroundColor: "#0000a7",
     color: "#fff",
-    marginHorizontal: 20,
-    borderRadius: 50,
+    borderRadius: 10,
   },
   elevation: {
-    elevation: 20,
-    shadowColor: "#9e9e9e",
+    elevation: 10,
+    shadowColor: Color.primary,
+  },
+
+  topCard: {
+    height: 70,
+    border: "none",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Color.primary,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
   },
 });

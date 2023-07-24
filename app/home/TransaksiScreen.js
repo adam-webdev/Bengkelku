@@ -71,7 +71,7 @@ const TransaksiScreen = () => {
               key={index}
               onPress={() => router.push("/DetailOrder/?id=" + item.id)}
             >
-              <View style={styles.box}>
+              <View style={[styles.box, styles.elevation]}>
                 <View style={{ gap: 8 }}>
                   <Text style={styles.name}>ORDERB3N600{item?.id}</Text>
                   <Text style={{ fontSize: 18 }}>
@@ -111,6 +111,7 @@ export default TransaksiScreen;
 const styles = StyleSheet.create({
   title: {
     padding: 8,
+    backgroundColor: "#fff",
   },
   textTitle: {
     fontSize: 18,
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     gap: 8,
+    backgroundColor: "#fff",
   },
   box: {
     gap: 5,
@@ -133,6 +135,11 @@ const styles = StyleSheet.create({
   },
   wrappLink: {
     marginBottom: 5,
+  },
+  elevation: {
+    elevation: 10,
+    shadowColor: Color.primary,
+    // shadowColor: "#9e9e9e",
   },
   status: {
     backgroundColor: "green",

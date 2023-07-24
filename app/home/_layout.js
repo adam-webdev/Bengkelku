@@ -5,6 +5,8 @@ import Transaksi from "@expo/vector-icons/FontAwesome5";
 import UserIcon from "@expo/vector-icons/FontAwesome";
 import Color from "../constants/Color";
 import { useStateContext, getUserInfo } from "./../hooks/Store";
+import Chatbot from "@expo/vector-icons/FontAwesome5";
+
 import { useEffect } from "react";
 export default Layout = () => {
   const { state, dispatch } = useStateContext();
@@ -96,6 +98,15 @@ export default Layout = () => {
             tabBarLabel: "ChatBot",
           }}
         /> */}
+        <Tabs.Screen
+          name="ChatbotScreen"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Chatbot name="headset" color={color} size={24} />
+            ),
+            tabBarLabel: "Chatbot",
+          }}
+        />
         <Tabs.Screen
           name="ProfileScreen"
           options={{

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TextInput } from "react-native";
+import { StyleSheet, View, Text, TextInput, ScrollView } from "react-native";
 // import Mapbox from "@rnmapbox/maps";
 import Color from "../constants/Color";
 
@@ -15,6 +15,8 @@ import Icon from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import CardBengkel from "./../components/CardBengkel";
+
 const ExploreScreen = () => {
   const { state } = useStateContext();
   const [data, setData] = useState([]);
@@ -151,10 +153,21 @@ const ExploreScreen = () => {
           onPress={() => getDataBengkelBySearch()}
           color={"white"}
           style={styles.icon}
-          size={24}
+          size={20}
           name="search"
         />
       </View>
+      <ScrollView style={styles.wrappCard}>
+        <View style={styles.container}>
+          {search
+            ? dataSearch?.map((item, index) => {
+                return <CardBengkel explore="true" item={item} key={index} />;
+              })
+            : data?.map((item, index) => {
+                return <CardBengkel explore="true" item={item} key={index} />;
+              })}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -167,6 +180,13 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     // alignItems: "center",
   },
+  container: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    position: "relative",
+    gap: 10,
+  },
   boxSearch: {
     position: "absolute",
     flexDirection: "row",
@@ -176,6 +196,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     fontSize: 16,
+    borderRadius: 4,
+  },
+  wrappCard: {
+    backgroundColor: "#fff",
+    height: 100,
   },
   elevation: {
     elevation: 20,
@@ -194,9 +219,9 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   input: {
-    padding: 10,
+    padding: 7,
   },
   map: {
-    flex: 1,
+    height: 380,
   },
 });
