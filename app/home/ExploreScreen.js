@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TextInput, ScrollView } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 // import Mapbox from "@rnmapbox/maps";
 import Color from "../constants/Color";
 
@@ -25,7 +32,25 @@ const ExploreScreen = () => {
   const [error, setError] = useState(false);
   const [search, setSearch] = useState();
   const router = useRouter();
+  const mapRef = useRef();
   // const token = useToken();
+
+  const screen = Dimensions.get("window");
+  const ASPECT_RATIO = screen.width / screen.height;
+  const LATITUDE_DELTA = 0.05;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+  const [region, setRegion] = useState({
+    latitude: state?.userLocation?.latitude,
+    longitude: state?.userLocation?.longitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
+
+  const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+
+  const updateStateLok = (data) =>
+    setRegion((region) => ({ ...region, ...data }));
 
   const getDataBengkel = async () => {
     // console.log("token", token);
@@ -82,56 +107,96 @@ const ExploreScreen = () => {
   const handleClose = () => {
     setSearch("");
   };
-  const initialLatitude = search
-    ? dataSearch?.latitude
-    : state?.userLocation?.latitude;
+  // const initialLatitude = search
+  //   ? parseFloat(dataSearch?.latitude)
+  //   : state?.userLocation?.latitude;
 
-  const initialLongitude = search
-    ? dataSearch?.longitude
-    : state?.userLocation?.longitude;
+  // const initialLongitude = search
+  //   ? parseFloat(dataSearch?.longitude)
+  //   : state?.userLocation?.longitude;
 
+  const handleZoomIn = () => {
+    updateStateLok({
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDelta: latitudeDelta / 2,
+      longitudeDelta: longitudeDelta / 2,
+    });
+    mapRef.current.animateToRegion(
+      {
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: latitudeDelta / 2,
+        longitudeDelta: longitudeDelta / 2,
+      },
+      100
+    );
+  };
+
+  const handleZoomOut = () => {
+    updateStateLok({
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDelta: latitudeDelta * 2,
+      longitudeDelta: longitudeDelta * 2,
+    });
+    mapRef.current.animateToRegion(
+      {
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: latitudeDelta * 2,
+        longitudeDelta: longitudeDelta * 2,
+      },
+      100
+    );
+  };
   return (
     <View style={styles.page}>
-      <MapView
-        provider={PROVIDER_GOOGLE} // Specify Google Maps as the provider
-        style={styles.map}
-        showsTraffic
-        followsUserLocation
-        initialRegion={{
-          latitude: initialLatitude,
-          longitude: initialLongitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        showsUserLocation
-      >
-        {search
-          ? dataSearch?.map((item, index) => (
-              <Marker
-                key={index}
-                title={item.nama_bengkel}
-                description={item.no_hp}
-                coordinate={{
-                  latitude: parseFloat(item.latitude),
-                  longitude: parseFloat(item.longitude),
-                }}
-                onPress={(e) => handleClickMarker(e)}
-              />
-            ))
-          : data?.map((item, index) => (
-              <Marker
-                key={index}
-                title={item.nama_bengkel}
-                description={item.no_hp}
-                coordinate={{
-                  latitude: parseFloat(item.latitude),
-                  longitude: parseFloat(item.longitude),
-                }}
-                onPress={(e) => handleClickMarker(e)}
-              />
-            ))}
-      </MapView>
-
+      <View>
+        <MapView
+          provider={PROVIDER_GOOGLE} // Specify Google Maps as the provider
+          style={styles.map}
+          showsTraffic
+          ref={mapRef}
+          followsUserLocation
+          initialRegion={{ latitude, longitude, latitudeDelta, longitudeDelta }}
+          showsUserLocation
+        >
+          {search
+            ? dataSearch?.map((item, index) => (
+                <Marker
+                  key={index}
+                  title={item.nama_bengkel}
+                  description={item.no_hp}
+                  coordinate={{
+                    latitude: parseFloat(item.latitude),
+                    longitude: parseFloat(item.longitude),
+                  }}
+                  onPress={(e) => handleClickMarker(e)}
+                />
+              ))
+            : data?.map((item, index) => (
+                <Marker
+                  key={index}
+                  title={item.nama_bengkel}
+                  description={item.no_hp}
+                  coordinate={{
+                    latitude: parseFloat(item.latitude),
+                    longitude: parseFloat(item.longitude),
+                  }}
+                  onPress={(e) => handleClickMarker(e)}
+                />
+              ))}
+        </MapView>
+        <View style={styles.buttonZoomInOut}>
+          <Text onPress={() => handleZoomIn()} style={styles.plusMinButton}>
+            +
+          </Text>
+          <Text onPress={() => handleZoomOut()} style={styles.plusMinButton}>
+            -
+          </Text>
+        </View>
+      </View>
       <View style={[styles.boxSearch, styles.elevation]}>
         <TextInput
           style={styles.input}
@@ -223,5 +288,23 @@ const styles = StyleSheet.create({
   },
   map: {
     height: 380,
+  },
+  buttonZoomInOut: {
+    position: "absolute",
+    width: 24,
+    right: 0,
+    bottom: 0,
+    marginRight: 10,
+    marginBottom: 10,
+    gap: 1,
+  },
+  plusMinButton: {
+    padding: 2,
+    textAlign: "center",
+    fontWeight: "bold",
+    backgroundColor: "#fff",
+    color: "#000",
+    fontSize: 18,
+    elevation: 2,
   },
 });

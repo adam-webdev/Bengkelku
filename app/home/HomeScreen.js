@@ -24,6 +24,7 @@ import * as Location from "expo-location";
 import useDaerah from "./../hooks/useDaerah";
 import useToken from "./../hooks/useToken";
 import CardBengkel from "./../components/CardBengkel";
+import Loader from "./../components/Loader";
 
 const HomeScreen = () => {
   const [data, setData] = useState([]);
@@ -53,63 +54,74 @@ const HomeScreen = () => {
       console.log(err);
     }
   };
-  console.log(state.userInfo.user);
+  console.log(state?.userInfo?.user);
   useEffect(() => {
     getDataBengkel();
   }, []);
 
-  useEffect(() => {
-    const getPermissionLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      // console.log("status", status);
-      if (status !== "granted") {
-        console.log("Permission to access location was denied");
-        return;
-      }
-      // console.log("getting location", location);
-      let currentLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-        maximumAge: 1000,
-      });
-      // console.log("current", currentLocation);
-      setLocation(currentLocation);
-      await AsyncStorage.setItem(
-        "userLocation",
-        JSON.stringify(currentLocation.coords)
-      );
-      dispatch({ type: "SAVE_LOCATION", payload: currentLocation.coords });
-      // console.log("curaatas",curlocation);
-      // try {
-      //   var curlocation = await Location.getCurrentPositionAsync({});
-      //   console.log("cur",curlocation);
-      // } catch {
-      //   curlocation = await Location.getCurrentPositionAsync({});
-      //   console.log(curlocation);aaa
-      // }
-    };
-    // const { coords } = curlocation;
+  const getPermissionLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    // console.log("status", status);
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
+      return;
+    }
+    //   console.log("getting location");
+    //   // let currentLocation = await Location.watchPositionAsync(
+    //   //   {
+    //   //     accuracy: Location.Accuracy.Highest,
+    //   //     // maximumAge: 1000,
+    //   //   },
+    //   //   async (loc) => {
+    //   //     console.log("lokasi terupdate :", loc);
+    //   //     await AsyncStorage.setItem("userLocation", JSON.stringify(loc.coords));
+    //   //     dispatch({ type: "SAVE_LOCATION", payload: loc.coords });
+    //   //     setLocation(loc.coords);
+    //   //   }
+    //   // );
+    //   // setLocation(currentLocation);
 
-    // if (coords) {
-    //   const { latitude, longitude } = coords;
-    // }
-    getPermissionLocation();
-  }, []);
+    console.log("cur start", curlocation);
+    let curlocation = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+      maximumAge: 10000,
+    });
 
-  // console.log("lokasi", location);
-  // console.log("home =>", state?.userInfo);
+    console.log("cur end", curlocation);
+    await AsyncStorage.setItem(
+      "userLocation",
+      JSON.stringify(curlocation.coords)
+    );
+    console.log("test dispatch");
+    dispatch({ type: "SAVE_LOCATION", payload: curlocation.coords });
+    setLocation(curlocation.coords);
+  };
+  // const { coords } = curlocation;
+
+  // if (coords) {
+  //   const { latitude, longitude } = coords;
+  // }
+
+  // console.log("coord :", location);
+  // // console.log("lokasi", location);
+  // // console.log("home =>", state?.userInfo);
   console.log("user location =>", state?.userLocation);
   // console.log("roles =>", state?.userInfo?.user?.roles[0]?.name);
   // console.log(state?.user);
+  useEffect(() => {
+    getPermissionLocation();
+  }, []);
   if (loading) {
-    return (
-      <ActivityIndicator
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        size="large"
-        color={Color.primary}
-      />
-    );
+    return <Loader isLoading={loading} />;
   }
   // const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const sliceName = (text) => {
+    const count = 6;
+    if (text) {
+      return text.slice(0, count) + (text.length > count ? "..." : "");
+    }
+    return null;
+  };
   return (
     <ScrollView style={{ backgroundColor: "#fff" }}>
       <View style={styles.topCard}>
@@ -123,7 +135,7 @@ const HomeScreen = () => {
             <Text style={styles.judul}>
               Selamat Datang{" "}
               <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-                {state?.userInfo?.user?.name}
+                {sliceName(state?.userInfo?.user?.name)}
               </Text>
             </Text>
             <Text style={{ fontSize: 16, color: "#3e3e3e" }}>
@@ -136,7 +148,7 @@ const HomeScreen = () => {
               <Text
                 style={{ color: "#fff", fontSize: 18, textAlign: "center" }}
               >
-                Cari sekarang >>
+                Cari sekarang
               </Text>
             </TouchableOpacity>
           </View>

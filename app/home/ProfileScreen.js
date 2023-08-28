@@ -76,7 +76,7 @@ const ProfileScreen = () => {
           <Text style={{ fontSize: 15 }}>Bekasi</Text>
         </View>
       </View>
-      {state?.userInfo?.user?.roles[0]?.name === "Admin Bengkel" ? (
+      {/* {state?.userInfo?.user?.roles[0]?.name === "Admin Bengkel" ? (
         <View style={styles.wrappLink}>
           <TouchableOpacity
             style={styles.button}
@@ -93,7 +93,7 @@ const ProfileScreen = () => {
         </View>
       ) : (
         ""
-      )}
+      )} */}
 
       <View style={styles.wrappLink}>
         <TouchableOpacity
@@ -112,7 +112,10 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.wrappLink}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          onPress={() => router.push("/home/TransaksiScreen")}
+          style={styles.button}
+        >
           <Text style={{ textAlign: "center", color: "#000", fontSize: 18 }}>
             Riwayat Transaksi
           </Text>

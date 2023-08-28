@@ -118,7 +118,6 @@ const DetailOrder = ({ navigation }) => {
     let currentLocation = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.Highest,
-        // maximumAge: 1000,
       },
       (loc) => {
         console.log("lokasi terupdate order:", loc);
@@ -128,13 +127,11 @@ const DetailOrder = ({ navigation }) => {
         //    JSON.stringify(loc.coords)
         //  );
         //  dispatch({ type: "SAVE_LOCATION", payload: loc.coords });
-        changeAnimate(loc.coords.latitude, loc.coords.longitude);
-        const lat = data?.lat;
-        const lng = data?.lng;
+        // changeAnimate(loc.coords.latitude, loc.coords.longitude);
+
         updateStateLok({
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
-
           coordinate: new AnimatedRegion({
             latitude: loc.coords.latitude,
             longitude: loc.coords.longitude,
@@ -144,32 +141,33 @@ const DetailOrder = ({ navigation }) => {
         });
       }
     );
-    // setLocation(currentLocation);
-
-    // console.log("curaatas",curlocation);
-    // try {
-    //   var curlocation = await Location.getCurrentPositionAsync({});
-    //   console.log("cur",curlocation);
-    // } catch {
-    //   curlocation = await Location.getCurrentPositionAsync({});
-    //   console.log(curlocation);aaa
-    // }
   };
+
+  // setLocation(currentLocation);
+
+  // console.log("curaatas",curlocation);
+  // try {
+  //   var curlocation = await Location.getCurrentPositionAsync({});
+  //   console.log("cur",curlocation);
+  // } catch {
+  //   curlocation = await Location.getCurrentPositionAsync({});
+  //   console.log(curlocation);aaa
+  // }
+  // useEffect(() => {
+  //   getLiveLocation();
+  // }, []);
   // const { coords } = curlocation;
 
   // if (coords) {
   //   const { latitude, longitude } = coords;
   // }
   // updateStateLok();
-  useEffect(() => {
-    getLiveLocation();
-  }, []);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getLiveLocation();
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     getLiveLocation();
+  //   }, 7000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const changeAnimate = (latitude, longitude) => {
     const newCoordinate = { latitude, longitude };
@@ -180,7 +178,6 @@ const DetailOrder = ({ navigation }) => {
     } else {
       coordinate.timing(newCoordinate).start();
     }
-    ``;
   };
 
   const getJarak = (newLatLng) => {

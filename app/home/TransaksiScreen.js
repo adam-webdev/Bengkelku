@@ -27,8 +27,13 @@ const TransaksiScreen = () => {
   const getOrderByUser = async () => {
     setLoading(true);
     const user_id = state.userInfo.user.id;
+
+    const urlUser = `${baseUrl}/order/${user_id}`;
+    const urlAdmin = `${baseUrl}/order-masuk/${user_id}`;
+    const url = state?.userInfo.user.tipe_user === "User" ? urlUser : urlAdmin;
+    console.log("url", url);
     try {
-      const response = await fetch(`${baseUrl}/order/${user_id}`, {
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +43,7 @@ const TransaksiScreen = () => {
       console.log("selesai");
       const result = await response.json();
       console.log("result order : ", result?.data);
+      console.log("selesai2");
       setData(result.data);
       setLoading(false);
     } catch (err) {
@@ -58,10 +64,18 @@ const TransaksiScreen = () => {
       />
     );
   }
+
+  // console.log("screen order : ", data);
   return (
     <>
       <View style={styles.title}>
-        <Text style={styles.textTitle}>Riwayat Order Anda :</Text>
+        {state?.userInfo?.user?.tipe_user === "User" ? (
+          <Text style={styles.textTitle}>
+            Riwayat Order Anda : ({data?.length})
+          </Text>
+        ) : (
+          <Text style={styles.textTitle}>Order Masuk : ({data?.length})</Text>
+        )}
       </View>
       <ScrollView>
         <View style={styles.container}>
@@ -69,14 +83,23 @@ const TransaksiScreen = () => {
             <TouchableOpacity
               style={{ gap: 8 }}
               key={index}
-              onPress={() => router.push("/DetailOrder/?id=" + item.id)}
+              // onPress={() => router.push("/DetailOrderBengkel")}
+              onPress={() =>
+                router.push("/DetailOrderBengkel00/?id=" + item.id)
+              }
+              // onPress={() => router.push("/DetailOrder/?id=" + item.id)}
             >
-              <View style={[styles.box, styles.elevation]}>
+              <View style={styles.box}>
+                {/* <View style={[styles.box, styles.elevation]}> */}
                 <View style={{ gap: 8 }}>
                   <Text style={styles.name}>ORDERB3N600{item?.id}</Text>
-                  <Text style={{ fontSize: 18 }}>
-                    {item?.bengkel?.nama_bengkel}
-                  </Text>
+                  {state?.userInfo?.user?.tipe_user === "User" ? (
+                    <Text style={{ fontSize: 18 }}>
+                      {item?.bengkel?.nama_bengkel}
+                    </Text>
+                  ) : (
+                    <Text style={{ fontSize: 18 }}>{item?.user?.name}</Text>
+                  )}
                   <Text style={{ fontSize: 16 }}>{item?.tanggal}</Text>
                 </View>
                 <View style={{ gap: 5, alignItems: "center" }}>
@@ -132,6 +155,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#ebebeb",
   },
   wrappLink: {
     marginBottom: 5,

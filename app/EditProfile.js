@@ -39,27 +39,7 @@ const EditProfile = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [telp, setTelp] = useState();
   const [jenisKelamin, setJenisKelamin] = useState();
-  const jenis_kelamin = [
-    "Laki-laki",
-    "Perempuan",
-    "asadfaef",
-    "asadfasf",
-    "dasafdfaa",
-    "Fdsfa",
-    "dasfaeaftew",
-    "et43534",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-    "y5y5y",
-  ];
+  const jenis_kelamin = ["Laki-laki", "Perempuan"];
   const router = useRouter();
   // const { nameParams, emialParams, telpParams } = params;
   const pickImage = async () => {
@@ -406,27 +386,27 @@ const EditProfile = ({ navigation }) => {
             />
             <FontAwesome name="pencil" color={Color.primary} size={14} />
           </View>
+          <View style={styles.wrappButton}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handlePerubahan()}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "#fff",
+                  fontSize: 18,
+                }}
+              >
+                Simpan Perubahan
+              </Text>
+              <Octicons
+                name="chevron-right"
+                style={{ color: "#fff", fontSize: 20 }}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View style={styles.wrappButton}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handlePerubahan()}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              color: "#fff",
-              fontSize: 18,
-            }}
-          >
-            Simpan Perubahan
-          </Text>
-          <Octicons
-            name="chevron-right"
-            style={{ color: "#fff", fontSize: 20 }}
-          />
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -445,7 +425,7 @@ const styles = StyleSheet.create({
     // margin: 10,
     // paddingHorizontal: 10,
     fontSize: 16,
-    flex: 3,
+    flex: 1,
   },
   boxImage: {
     // width: 50,
@@ -496,7 +476,8 @@ const styles = StyleSheet.create({
   },
   wrappButton: {
     marginTop: 15,
-    justifyContent: "flex-end",
+    // justifyContent: "flex-end",
+    bottom: 0,
   },
   button: {
     backgroundColor: Color.primary,

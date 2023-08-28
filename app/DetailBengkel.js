@@ -23,6 +23,7 @@ import useToken from "./hooks/useToken";
 import Chatbot from "@expo/vector-icons/FontAwesome5";
 import Whatsapp from "@expo/vector-icons/FontAwesome";
 import { showAlert } from "./components/Alert";
+import Loader from "./components/Loader";
 
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
@@ -113,22 +114,24 @@ const DetailBengkel = ({ navigation }) => {
 
   if (loading) {
     return (
-      <ActivityIndicator
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        size="large"
-        color={Color.primary}
-      />
+      // <ActivityIndicator
+      //   style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      //   size="large"
+      //   color={Color.primary}
+      // />
+      <Loader isLoading={loading} />
     );
   }
   const sendWhatsApp = (phone) => {
-    let msg = "type something";
+    let msg = "Halo admin saya mau order apakah buka?.";
+    let phoneIndo = phone.slice(0, 1);
     let phoneWithCountryCode = phone;
 
-    let mobile =
-      Platform.OS == "ios" ? phoneWithCountryCode : "+" + phoneWithCountryCode;
-    if (mobile) {
+    // let mobile =
+    //   Platform.OS == "ios" ? phoneWithCountryCode : "+" + phoneWithCountryCode;
+    if (phone) {
       if (msg) {
-        let url = "whatsapp://send?text=" + msg + "&phone=" + mobile;
+        let url = "whatsapp://send?text=" + msg + "&phone=" + phone;
         Linking.openURL(url)
           .then((data) => {
             console.log("WhatsApp Opened");

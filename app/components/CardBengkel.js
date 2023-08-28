@@ -90,19 +90,16 @@ const CardBengkel = ({ item, explore }) => {
         onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
       >
         <View
-          style={[
-            styles.elevation,
-            {
-              backgroundColor: "#fff",
-              padding: 10,
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-              borderRadius: 10,
-              // borderWidth: 1,
-              // borderColor: "grey",
-            },
-          ]}
+          style={{
+            backgroundColor: "#fff",
+            padding: 10,
+            flexDirection: "row",
+            gap: 10,
+            alignItems: "center",
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#ebebeb",
+          }}
         >
           {item?.foto_bengkel ? (
             <Image

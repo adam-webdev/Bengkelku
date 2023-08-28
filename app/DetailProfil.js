@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import * as Location from "expo-location";
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "expo-router";
@@ -24,6 +25,7 @@ const DetailProfil = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
+  const [locationUser, setLocationUser] = useState();
   const router = useRouter();
   const getDetailProfil = async () => {
     setLoading(true);
@@ -43,10 +45,25 @@ const DetailProfil = ({ navigation }) => {
       console.log(err);
     }
   };
+
+  const reverseGeocodeUser = async () => {
+    try {
+      console.log("Mulai");
+      const LocUser = await Location.reverseGeocodeAsync({
+        latitude: state?.userLocation.latitude,
+        longitude: state?.userLocation.longitude,
+      });
+      setLocationUser(LocUser[0]);
+      console.log("end");
+      console.log("LocationUser : ", LocUser);
+    } catch (err) {
+      console.log("error is : ", err);
+    }
+  };
   useEffect(() => {
     getDetailProfil();
+    reverseGeocodeUser();
   }, []);
-
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");
   const kota = useDaerah(data?.kota_id, "kota");
   const kecamatan = useDaerah(data?.kecamatan_id, "kecamatan");
@@ -68,6 +85,7 @@ const DetailProfil = ({ navigation }) => {
   //   jenis_kelamin: data.jenis_kelamin,
   //   foto: data.foto,
   // };
+  console.log("location ", locationUser?.city);
   return (
     <>
       <Stack
@@ -93,58 +111,14 @@ const DetailProfil = ({ navigation }) => {
             />
           )}
           <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
-            {/* {data?.nama_bengkel}  */}
             {data?.name}
           </Text>
-          {/* <Text>
-            {kota?.name}, {provinsi?.name}
-          </Text> */}
+
           <Text>
             {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
           </Text>
-          {/* {data?.tipe_user === null ? (
-            <>
-              <TouchableOpacity
-                onPress={() => router.push("/CreateBengkel")}
-                style={{
-                  backgroundColor: Color.secondaryColor,
-                  paddingHorizontal: 12,
-                  paddingVertical: 5,
-                  borderRadius: 4,
-                  marginTop: 6,
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                  Buat Bengkel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push("/CreateBengkel")}
-                style={{
-                  backgroundColor: Color.secondaryColor,
-                  paddingHorizontal: 12,
-                  paddingVertical: 5,
-                  borderRadius: 4,
-                  marginTop: 6,
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                  Buat Bengkel
-                </Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            ""
-          )} */}
-          {/* <TouchableOpacity>
-            <Text>Bengkel Saya</Text>
-          </TouchableOpacity> */}
         </View>
         <View style={{ backgroundColor: "#fff" }}>
-          {/* <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {data?.nama_bengkel}
-          </Text> */}
-
           <Text
             style={{
               fontSize: 16,
@@ -155,7 +129,6 @@ const DetailProfil = ({ navigation }) => {
           >
             Detail :
           </Text>
-
           <View style={styles.itemWrapp}>
             <Foundation
               size={26}
@@ -182,38 +155,30 @@ const DetailProfil = ({ navigation }) => {
               color={Color.primary}
             />
             <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              Alamat :
+              Lokasi saat ini :
             </Text>
           </View>
+          {/* city": "Kecamatan Sidoarjo", "country": "Indonesia", "district":
+          "Sidokumpul", "isoCountryCode": "ID", "name": "8E", "postalCode":
+          "61213", "region": "Jawa Timur", "street": "Jalan Diponegoro",
+          "streetNumber": "8E", "subregion": "Kabupaten Sidoarjo", "timezone":
+          null} */}
           <View style={styles.itemWrapp}>
             <Text style={[styles.itemText, { width: "25%" }]}>Desa </Text>
-            <Text style={styles.itemText}>: {desa?.name ?? "-"}</Text>
+            <Text style={styles.itemText}>: {locationUser?.district}</Text>
           </View>
           <View style={styles.itemWrapp}>
             <Text style={[styles.itemText, { width: "25%" }]}>Kecamatan </Text>
-            <Text style={styles.itemText}>: {kecamatan?.name ?? "-"}</Text>
+            <Text style={styles.itemText}>: {locationUser?.city}</Text>
           </View>
           <View style={styles.itemWrapp}>
             <Text style={[styles.itemText, { width: "25%" }]}>Kota </Text>
-            <Text style={styles.itemText}>: {kota?.name ?? "-"}</Text>
+            <Text style={styles.itemText}>: {locationUser?.subregion}</Text>
           </View>
           <View style={styles.itemWrapp}>
             <Text style={[styles.itemText, { width: "25%" }]}>Provinsi </Text>
-            <Text style={styles.itemText}>: {provinsi?.name ?? "-"}</Text>
+            <Text style={styles.itemText}>: {locationUser?.region}</Text>
           </View>
-
-          {/* <View style={styles.itemWrapp}>
-            <Foundation
-              size={26}
-              style={styles.icon}
-              name="clock"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}>
-              {" "}
-              {data?.jam_buka} - {data?.jam_tutup}
-            </Text>
-          </View> */}
           <View style={styles.itemWrapp}></View>
         </View>
         <TouchableOpacity
@@ -275,6 +240,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     paddingVertical: 6,
+    borderBottom: "#ebebeb",
     gap: 8,
     // shadowProp: {
     shadowColor: "#171717",
