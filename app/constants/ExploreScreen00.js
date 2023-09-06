@@ -5,16 +5,13 @@ import {
   Text,
   TextInput,
   ScrollView,
-  Image,
   Dimensions,
 } from "react-native";
-
 // import Mapbox from "@rnmapbox/maps";
 import Color from "../constants/Color";
-import Mapbox from "@rnmapbox/maps";
 
 import { useRouter, Link } from "expo-router";
-// import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import {
   useStateContext,
   getUserInfo,
@@ -24,15 +21,8 @@ import {
 import Icon from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-// import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import CardBengkel from "./../components/CardBengkel";
-import ZoomButton from "./../components/ZoomButton";
-
-const APIKEY =
-  "pk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xqbWw5dHBtMTA0dDN0cGJtNGZmMzJidiJ9.Fue2Wxs6TUoFjyBMXgK8Wg";
-Mapbox.setAccessToken(
-  "pk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xqbWw5dHBtMTA0dDN0cGJtNGZmMzJidiJ9.Fue2Wxs6TUoFjyBMXgK8Wg"
-);
 
 const ExploreScreen = () => {
   const { state } = useStateContext();
@@ -53,12 +43,11 @@ const ExploreScreen = () => {
   const [region, setRegion] = useState({
     latitude: state?.userLocation?.latitude,
     longitude: state?.userLocation?.longitude,
-    coords: [state?.userLocation?.longitude, state?.userLocation?.latitude],
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  const { latitude, longitude, latitudeDelta, coords, longitudeDelta } = region;
+  const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
 
   const updateStateLok = (data) =>
     setRegion((region) => ({ ...region, ...data }));
@@ -164,65 +153,49 @@ const ExploreScreen = () => {
   return (
     <View style={styles.page}>
       <View>
-        <Mapbox.MapView
+        <MapView
+          provider={PROVIDER_GOOGLE} // Specify Google Maps as the provider
           style={styles.map}
-          scaleBarEnabled={false}
-          onPress={(e) => console.log(e)}
-          compassEnabled={true}
-          compassPosition={{ bottom: 0, right: 8 }}
-          zoomEnabled={true}
-          // styleURL="mapbox://styles/mapbox/streets-v12"
-          styleURL="mapbox://styles/mapbox/navigation-day-v1"
+          showsTraffic
+          ref={mapRef}
+          followsUserLocation
+          initialRegion={{ latitude, longitude, latitudeDelta, longitudeDelta }}
+          showsUserLocation
         >
-          <Mapbox.Camera
-            zoomLevel={12}
-            centerCoordinate={coords}
-            animationMode={"flyTo"}
-            animationDuration={6000}
-          />
           {search
             ? dataSearch?.map((item, index) => (
-                <Mapbox.PointAnnotation
-                  id={"lokasibengkel" + index}
+                <Marker
                   key={index}
-                  coordinate={[
-                    parseFloat(item.longitude),
-                    parseFloat(item.latitude),
-                  ]}
-                  // onPress={(e) => handleClickMarker(e)}
-                >
-                  <View style={styles.destinationIcon}>
-                    <Icon name="user-circle" size={24} color="#E1710A" />
-                    {/* <Image source={require("../../assets/img/mechanic.png")} /> */}
-                  </View>
-                </Mapbox.PointAnnotation>
+                  title={item.nama_bengkel}
+                  description={item.no_hp}
+                  coordinate={{
+                    latitude: parseFloat(item.latitude),
+                    longitude: parseFloat(item.longitude),
+                  }}
+                  onPress={(e) => handleClickMarker(e)}
+                />
               ))
             : data?.map((item, index) => (
-                <Mapbox.PointAnnotation
-                  id={"lokasibengkelku" + index}
+                <Marker
                   key={index}
-                  coordinate={[
-                    parseFloat(item.longitude),
-                    parseFloat(item.latitude),
-                  ]}
-                  // onPress={(e) => handrleClickMarker(e)}
-                >
-                  <View style={styles.destinationIcon}>
-                    <Icon name="user-circle" size={24} color="#E1710A" />
-                    {/* <Image
-                      width={30}
-                      source={require("../../assets/img/mechanic.png")}
-                    /> */}
-                  </View>
-                </Mapbox.PointAnnotation>
+                  title={item.nama_bengkel}
+                  description={item.no_hp}
+                  coordinate={{
+                    latitude: parseFloat(item.latitude),
+                    longitude: parseFloat(item.longitude),
+                  }}
+                  onPress={(e) => handleClickMarker(e)}
+                />
               ))}
-
-          <Mapbox.UserLocation
-            animated={true}
-            androidRenderMode="normal"
-            showsUserHeadingIndicator={true}
-          />
-        </Mapbox.MapView>
+        </MapView>
+        <View style={styles.buttonZoomInOut}>
+          <Text onPress={() => handleZoomIn()} style={styles.plusMinButton}>
+            +
+          </Text>
+          <Text onPress={() => handleZoomOut()} style={styles.plusMinButton}>
+            -
+          </Text>
+        </View>
       </View>
       <View style={[styles.boxSearch, styles.elevation]}>
         <TextInput
@@ -278,9 +251,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     position: "relative",
     gap: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ebebeb",
   },
   boxSearch: {
     position: "absolute",
@@ -317,7 +287,7 @@ const styles = StyleSheet.create({
     padding: 7,
   },
   map: {
-    height: 400,
+    height: 380,
   },
   buttonZoomInOut: {
     position: "absolute",
@@ -335,12 +305,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     color: "#000",
     fontSize: 18,
-    // elevation: 2,
-  },
-  destinationIcon: {
-    width: 30,
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
+    elevation: 2,
   },
 });

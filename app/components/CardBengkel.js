@@ -37,22 +37,23 @@ const CardBengkel = ({ item, explore }) => {
       // <Link href={{ pathname: "/bengkel/[id]", params: { id: 1 } }}>
 
       <TouchableOpacity
+        style={{
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: "#ebebeb",
+        }}
         onPress={() => router.push("/DetailBengkel/?id=" + item?.id)}
       >
         <View
-          style={[
-            styles.elevation,
-            {
-              backgroundColor: "#fff",
-              padding: 10,
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-              borderRadius: 10,
-              // borderWidth: 1,
-              // borderColor: "grey",
-            },
-          ]}
+          style={{
+            backgroundColor: "#fff",
+            padding: 10,
+            gap: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            // borderWidth: 1,
+            // borderColor: "grey",
+          }}
         >
           {item?.foto_bengkel ? (
             <Image
@@ -140,8 +141,8 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 10,
   },
-  elevation: {
-    elevation: 10,
-    shadowColor: Color.primary,
-  },
+  // elevation: {
+  //   elevation: 10,
+  //   shadowColor: Color.primary,
+  // },
 });

@@ -8,6 +8,7 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
+import UserLocationIcon from "../assets/img/iconmotor.png";
 import * as Location from "expo-location";
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect, useRef } from "react";
@@ -71,10 +72,11 @@ const DetailOrderBengkel = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
-  const [location, setLocation] = useState();
+  const [location, setLocation] = useState([]);
+  const [button, setButton] = useState(false);
   const router = useRouter();
 
-  const markerRef = useRef();
+  const intervalRef = useRef(null);
   const mapRef = useRef();
   const screen = Dimensions.get("window");
   const ASPECT_RATIO = screen.width / screen.height;
@@ -82,15 +84,15 @@ const DetailOrderBengkel = () => {
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   const [stateLok, setStateLok] = useState({
-    latitude: state?.userLocation?.latitude,
-    longitude: state?.userLocation?.longitude,
+    latitude: "",
+    longitude: "",
     // coords: [12.48839, 50.72724],
     coords: [state?.userLocation?.longitude, state?.userLocation?.latitude],
     // coords: [-7.379778, 112.639269],
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
     routeCordinates: [-7.379778, 112.639269],
-    destinationCoordss: [],
+    destinationCoordss: [-7.379778, 112.639269],
     // destinationCoordss: [-7.379897793082899, 112.63985632918775],
 
     jarakDriver: 0,
@@ -112,38 +114,74 @@ const DetailOrderBengkel = () => {
   const updateStateLok = (data) => {
     setStateLok((stateLok) => ({ ...stateLok, ...data }));
   };
+  const getPermissionLocation = async () => {
+    let isMounted = true;
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    // console.log("status", status);
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
+      return;
+    }
+
+    console.log("tracking screen start", curlocation);
+    let curlocation = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Highest,
+      maximumAge: 10000,
+    });
+
+    if (intervalRef.current) {
+      await sendDataTrack(
+        curlocation?.coords.longitude,
+        curlocation?.coords.latitude
+      );
+    }
+
+    if (isMounted) {
+      await createRouterLine(
+        curlocation?.coords.longitude,
+        curlocation?.coords.latitude
+      );
+      updateStateLok({
+        coords: [curlocation?.coords?.longitude, curlocation?.coords?.latitude],
+      });
+      console.log("tracking end", curlocation);
+
+      setLocation(curlocation.coords);
+    }
+  };
   // const { store } = route.params;
   // console.log(coords)
-  const getLiveLocation = async () => {
-    // let { status } = await Location.requestForegroundPermissionsAsync();
-    // // console.log("status", status);
-    // if (status !== "granted") {
-    //   console.log("Permission to access location was denied");
-    //   return;
-    // }
-    console.log("getting location");
-    let currentLocation = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.Highest,
-        // maximumAge: 1000,
-      },
-      (loc) => {
-        // console.log("lokasi terupdate order:", loc);
-        // result data =>lokasi terupdate order: {"coords": {"accuracy": 20, "altitude": 0, "altitudeAccuracy": 40, "heading": 0, "latitude": -7.464415, "longitude": 112.691165, "speed": 0}, "mocked": false, "timestamp": 1690650315351}
+  // const getLiveLocation = async () => {
+  //   // let { status } = await Location.requestForegroundPermissionsAsync();
+  //   // // console.log("status", status);
+  //   // if (status !== "granted") {
+  //   //   console.log("Permission to access location was denied");
+  //   //   return;
+  //   // }
+  //   console.log("getting location");
+  //   let currentLocation = await Location.watchPositionAsync(
+  //     {
+  //       accuracy: Location.Accuracy.Highest,
+  //       // maximumAge: 1000,
+  //     },
+  //     (loc) => {
+  //       // console.log("lokasi terupdate order:", loc);
+  //       // result data =>lokasi terupdate order: {"coords": {"accuracy": 20, "altitude": 0, "altitudeAccuracy": 40, "heading": 0, "latitude": -7.464415, "longitude": 112.691165, "speed": 0}, "mocked": false, "timestamp": 1690650315351}
 
-        // changeAnimate(loc.coords.latitude, loc.coords.longitude);
-        const lat = data?.lat;
-        const lng = data?.lng;
-        // updateStateLok({
-        //   latitude: loc.coords.latitude,
-        //   longitude: loc.coords.longitude,
-        // });
-        updateStateLok({
-          coords: [loc.coords.longitude, loc.coords.latitude],
-        });
-      }
-    );
-  };
+  //       // changeAnimate(loc.coords.latitude, loc.coords.longitude);
+  //       sendDataTrack(loc.coords.longitude, loc.coords.latitude);
+
+  //       updateStateLok({
+  //         latitude: loc.coords.latitude,
+  //         longitude: loc.coords.longitude,
+  //       });
+
+  //       updateStateLok({
+  //         coords: [loc.coords.longitude, loc.coords.latitude],
+  //       });
+  //     }
+  //   );
+  // };
   // console.log("lt", data?.lat);
   // console.log("lg", data?.lng);
   // async function getPermissionLocation() {
@@ -159,16 +197,26 @@ const DetailOrderBengkel = () => {
   //   }
   // }
 
-  useEffect(() => {
-    getLiveLocation();
-  }, []);
+  // useEffect(() => {
+  //   intervalRef.current = setInterval(() => {
+  //     // getLiveLocation();
+  //     getPermissionLocation();
+  //   }, 20000);
+  // }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getLiveLocation();
-    }, 20000);
-    return () => clearInterval(interval);
-  }, [coords]);
+  // console.log(intervalRef.current)
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (button) {
+  //       console.log("ini dalam interval", latitude, longitude);
+  //       // getLiveLocation();
+  //       sendDataTrack();
+  //     }
+  //   }, 20000);
+  //   if (button === false) {
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [button]);
 
   // useEffect(() => {
   //   //console.log(store.longitude);
@@ -190,8 +238,8 @@ const DetailOrderBengkel = () => {
       console.log("detail Order =", result.data);
       updateStateLok({
         destinationCoordss: [
-          parseFloat(result?.data.lat),
           parseFloat(result?.data.lng),
+          parseFloat(result?.data.lat),
         ],
       }),
         setData(result.data);
@@ -202,6 +250,59 @@ const DetailOrderBengkel = () => {
   };
   useEffect(() => {
     getDetailOrder();
+  }, []);
+
+  useEffect(() => {
+    getPermissionLocation();
+  }, []);
+
+  const sendDataTrack = async (lng, lat) => {
+    console.log("mulai post data track");
+    try {
+      const response = await fetch(`${baseUrl}/tracking`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+        body: JSON.stringify({
+          bengkel_id: data?.bengkel_id,
+          lng,
+          lat,
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        console.log("hasil track ==> ", result);
+      }
+    } catch (err) {
+      console.log("error track is :", err);
+    }
+  };
+
+  const handleButtonMulai = () => {
+    setButton(true);
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(() => {
+        getPermissionLocation();
+        isMounted = false;
+      }, 60000);
+    }
+  };
+
+  const handleButtonSelesai = () => {
+    setButton(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      isMounted = false;
+      handleButtonSelesai();
+    };
   }, []);
   function makeRouterFeature(coordinates) {
     let routerFeature = {
@@ -220,10 +321,11 @@ const DetailOrderBengkel = () => {
     return routerFeature;
   }
 
-  const createRouterLine = async (coords) => {
-    const startCoords = `${coords[0]},${coords[1]}`;
-    const endCoords = `${destinationCoordss[1]},${destinationCoordss[0]}`;
-    // console.log("start :", startCoords);
+  const createRouterLine = async (lng, lat) => {
+    // const startCoords = `${coords[0]},${coords[1]}`;
+    const startCoords = `${lng},${lat}`;
+    const endCoords = `${destinationCoordss[0]},${destinationCoordss[1]}`;
+    console.log("start :", startCoords);
     // console.log("coord :", coords);
     // console.log("end :", endCoords);
     const geometries = "geojson";
@@ -287,22 +389,29 @@ const DetailOrderBengkel = () => {
   //   </TouchableOpacity>
   // );
 
-  // console.log("type data routecordinates: ", routeCordinates);
+  // console.log("type data routecordinates: ", routeCord`inates);
   return (
     <View style={styles.container}>
       <Mapbox.MapView
         style={styles.map}
+        scaleBarEnabled={false}
+        onPress={(e) => console.log(e)}
+        compassEnabled={true}
         zoomEnabled={true}
+        // styleURL="mapbox://styles/mapbox/streets-v12"
         styleURL="mapbox://styles/mapbox/navigation-day-v1"
         // styleURL="mapbox://styles/mapbox/navigation-night-v1"
-        rotateEnabled={true}
+        // rotateEnabled={true}
         onDidFinishLoadingMap={async () => {
-          await createRouterLine(coords);
+          await createRouterLine(
+            state?.userLocation?.longitude,
+            state?.userLocation?.latitude
+          );
           // await createRouterLine(coords, selectedRouteProfile);
         }}
       >
         <Mapbox.Camera
-          zoomLevel={10}
+          zoomLevel={12}
           centerCoordinate={coords}
           animationMode={"flyTo"}
           animationDuration={6000}
@@ -312,28 +421,32 @@ const DetailOrderBengkel = () => {
             <Mapbox.LineLayer
               id="routerLine01"
               style={{
-                lineColor: "blue",
+                lineColor: Color.primary,
                 lineWidth: 4,
               }}
             />
           </Mapbox.ShapeSource>
         )}
-        {/* {routeCordinates && (
+        {console.log(coords, "ini coords")}
+        {console.log(destinationCoordss, "ini destinationCoordss")}
+        {destinationCoordss && (
           <Mapbox.PointAnnotation
             id="destinationPoint"
-            coordinate={routeCordinates}
+            coordinate={destinationCoordss}
           >
             <View style={styles.destinationIcon}>
               <Icon name="user-circle" size={24} color="#E1710A" />
             </View>
           </Mapbox.PointAnnotation>
-        )} */}
+        )}
         <Mapbox.UserLocation
+          visible={true}
           animated={true}
-          // onUpdate={async () => {
-          //   await createRouterLine(coords);
-          // }}
-          androidRenderMode={"gps"}
+          onUpdate={(location) => {
+            // Handle pembaruan lokasi pengguna di sini
+            console.log("ini user loction", location);
+          }}
+          androidRenderMode="normal"
           showsUserHeadingIndicator={true}
         />
       </Mapbox.MapView>
@@ -353,7 +466,7 @@ const DetailOrderBengkel = () => {
       >
         <Icon name="arrow-left" size={24} color="#ffffff" />
       </TouchableOpacity>
-      {/* {loading ? (
+      {loading ? (
         <ActivityIndicator
           size="large"
           color="white"
@@ -362,19 +475,38 @@ const DetailOrderBengkel = () => {
       ) : (
         routeDirections && (
           <View style={styles.cardContainer}>
-            <ColorfulCard
-              title="test"
-              // title={`${store.name}`}
-              value={`${duration} h`}
-              footerTitle="Distance"
-              footerValue={`${distance} km`}
-              // iconImageSource={require("../assets/icons/info.png")}
-              style={{ backgroundColor: "#33495F" }}
-              onPress={() => {}}
-            />
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor:
+                    button === false ? Color.secondaryColor : "#00AA13", // Ganti backgroundColor dengan properti yang benar
+                },
+              ]}
+            >
+              <Text style={styles.title}>Waktu </Text>
+              <Text style={styles.content}>{duration} jam</Text>
+              <Text style={styles.title}>Jarak</Text>
+              <Text style={styles.content}>{distance} km</Text>
+            </View>
           </View>
         )
-      )} */}
+      )}
+      {button === false ? (
+        <TouchableOpacity
+          style={styles.buttonMulai}
+          onPress={() => handleButtonMulai()}
+        >
+          <Text style={styles.textButtonMulai}>Berangkat</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.buttonMulai}
+          onPress={() => handleButtonSelesai()}
+        >
+          <Text style={styles.textButtonSelesai}>Selesai</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -387,10 +519,25 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+  card: {
+    backgroundColor: Color.secondaryColor,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    gap: 4,
+    borderRadius: 8,
+  },
+  title: {
+    color: "#fff",
+  },
+  content: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   backButton: {
     position: "absolute",
     top: 20,
-    left: 20,
+    left: 10,
     zIndex: 1,
     backgroundColor: "rgba(0, 0 ,0 , 0.5)",
     borderRadius: 20,
@@ -404,10 +551,11 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     position: "absolute",
-    top: 20,
-    right: 20,
+    top: 50,
+    right: 10,
     zIndex: 1,
   },
+
   destinationIcon: {
     width: 30,
     height: 30,
@@ -427,6 +575,32 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "transparent",
     zIndex: 1,
+  },
+  buttonMulai: {
+    position: "absolute",
+    bottom: 0,
+    padding: 10,
+    width: "100%",
+  },
+  textButtonMulai: {
+    color: "#fff",
+    backgroundColor: Color.secondaryColor,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    textAlign: "center",
+    fontSize: 22,
+    borderRadius: 50,
+    fontWeight: 600,
+  },
+  textButtonSelesai: {
+    color: "#fff",
+    backgroundColor: "#00AA13",
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    textAlign: "center",
+    fontSize: 22,
+    borderRadius: 50,
+    fontWeight: 600,
   },
   routeProfileButton: {
     width: 80,
