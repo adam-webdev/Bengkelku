@@ -7,6 +7,7 @@ import {
   TextInput,
   Image,
   ScrollView,
+  ImageBackground,
 } from "react-native";
 import Color from "../constants/Color";
 import Bot from "@expo/vector-icons/FontAwesome5";
@@ -393,7 +394,10 @@ const ChatbotScreen = () => {
   //   return <Text>laoding</Text>;
   // }
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require("../../assets/img/bgwa.jpg")}
+      style={styles.container}
+    >
       <ScrollView style={{ padding: 10 }}>
         <Card text={"Selamat datang " + state?.user?.name + " di KuvaBot."} />
         <Card
@@ -446,7 +450,7 @@ const ChatbotScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 

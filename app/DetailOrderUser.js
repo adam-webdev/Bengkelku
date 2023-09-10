@@ -6,62 +6,86 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Dimensions,
+  FlatList,
 } from "react-native";
-import { WebView } from "react-native-webview";
+import customUserLocationIcon from "../assets/img/iconmotor.png";
 import * as Location from "expo-location";
-
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams, useRouter } from "expo-router";
-import { Stack } from "expo-router";
+import { useSearchParams, useRouter, Stack } from "expo-router";
 import { useStateContext, baseUrl } from "./hooks/Store";
 import Color from "./constants/Color";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Foundation from "@expo/vector-icons/Foundation";
-import IonIcons from "@expo/vector-icons/Ionicons";
+// import IonIcons from "@expo/vector-icons/Ionicons";
 import useDaerah from "./hooks/useDaerah";
-import useToken from "./hooks/useToken";
-import MapView, {
-  PROVIDER_GOOGLE,
-  Marker,
-  AnimatedRegion,
-  Polyline,
-} from "react-native-maps";
-import MapViewDirections from "react-native-maps-directions";
+import Mapbox from "@rnmapbox/maps";
+// import Geolocation from "@react-native-community/geolocation";
+import { useNavigation, useRoute } from "@react-navigation/native";
+// import {APIKEY} from '../utils/key';
+import ColorfulCard from "@freakycoder/react-native-colorful-card";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import SimpleIcon from "react-native-vector-icons/SimpleLineIcons";
+import Ionicons from "react-native-vector-icons/MaterialIcons";
 
-const GOOGLE_MAPS_APIKEY = "AIzaSyDfZm5mtVteNjhiPfSoyq7Gkhz07hUW03k";
-// const GOOGLE_MAPS_APIKEY = "AIzaSyAuYand6-drJrEpJfHdPogNWyGevtUM5IQ";
-const DetailOrder = ({ navigation }) => {
-  const { id } = useSearchParams();
+// Logger.setLogCallback((log) => {
+//   const { message } = log;
+
+//   if (
+//     message.match("Request failed due to a permanent error: Canceled") ||
+//     message.match("Request failed due to a permanent error: Socket Closed")
+//   ) {
+//     return true;
+//   }
+//   return false;
+// });
+const APIKEY =
+  "pk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xqbWw5dHBtMTA0dDN0cGJtNGZmMzJidiJ9.Fue2Wxs6TUoFjyBMXgK8Wg";
+Mapbox.setAccessToken(
+  "pk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xqbWw5dHBtMTA0dDN0cGJtNGZmMzJidiJ9.Fue2Wxs6TUoFjyBMXgK8Wg"
+);
+
+const DetailOrderBengkel = () => {
+  const [routeDirections, setRouteDirections] = useState(null);
+  // const [coords, setCoords] = useState([12.48839, 50.72724]);
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
+
+  const [selectedRouteProfile, setselectedRouteProfile] = useState("walking");
+  // const route = useRoute();
+  const navigation = useNavigation();
+  const { id, bengkel_id, longitudeOrder, latitudeOrder } = useSearchParams();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { state } = useStateContext();
-  const [location, setLocation] = useState();
+  const [location, setLocation] = useState([]);
+  const [button, setButton] = useState(true);
   const router = useRouter();
-
-  const markerRef = useRef();
-  const mapRef = useRef();
+  const intervalRef = useRef(null);
   const screen = Dimensions.get("window");
   const ASPECT_RATIO = screen.width / screen.height;
   const LATITUDE_DELTA = 0.05;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   const [stateLok, setStateLok] = useState({
-    latitude: state?.userLocation?.latitude,
-    longitude: state?.userLocation?.longitude,
+    latitude: "",
+    heading: 90,
+    longitude: "",
+    // coords: [12.48839, 50.72724],
+    coords: [state?.userLocation?.longitude, state?.userLocation?.latitude],
+    // coords: [-7.379778, 112.639269],
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
-    routeCordinates: [],
-    destinationCoords: {},
+    routeCordinates: [-7.379778, 112.639269],
+    lokasiUser: [longitudeOrder, latitudeOrder],
+    lokasiMontir: [longitudeOrder, latitudeOrder],
+    // state?.userLocation?.longitude,
+    //   state?.userLocation?.latitude,
+    // destinationCoordss: [-7.379897793082899, 112.63985632918775],
+
     jarakDriver: 0,
     prevLatLng: {},
-    coordinate: new AnimatedRegion({
-      latitude: state?.userLocation?.latitude,
-      longitude: state?.userLocation?.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    }),
   });
 
   const {
@@ -70,19 +94,94 @@ const DetailOrder = ({ navigation }) => {
     routeCordinates,
     jarakDriver,
     prevLatLng,
-    coordinate,
-    destinationCoords,
+    coords,
+    lokasiUser,
+    heading,
     latitudeDelta,
     longitudeDelta,
+    lokasiMontir,
   } = stateLok;
 
-  const updateStateLok = (data) =>
+  const updateStateLok = (data) => {
     setStateLok((stateLok) => ({ ...stateLok, ...data }));
+  };
+  // const getPermissionLocation = async () => {
+  //   let isMounted = true;
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   // console.log("status", status);
+  //   if (status !== "granted") {
+  //     console.log("Permission to access location was denied");
+  //     return;
+  //   }
 
-  const getDetailOrder = async () => {
-    setLoading(true);
+  //   console.log("tracking screen start", curlocation);
+  //   let curlocation = await Location.getCurrentPositionAsync({
+  //     accuracy: Location.Accuracy.Highest,
+  //     maximumAge: 10000,
+  //   });
+
+  //   if (intervalRef.current) {
+  //     await sendDataTrack(
+  //       curlocation?.coords.longitude,
+  //       curlocation?.coords.latitude
+  //     );
+  //   }
+
+  //   if (isMounted) {
+  //     await createRouterLine(
+  //       curlocation?.coords.longitude,
+  //       curlocation?.coords.latitude
+  //     );
+  //     updateStateLok({
+  //       coords: [curlocation?.coords?.longitude, curlocation?.coords?.latitude],
+  //     });
+  //     console.log("tracking end", curlocation);
+
+  //     setLocation(curlocation.coords);
+  //   }
+  // };
+  // const getDetailOrder = async () => {
+  //   setLoading(true);
+  //   console.log("id", id);
+  //   console.log("bengkel id", bengkel_id);
+  //   try {
+  //     const response = await fetch(`${baseUrl}/detail-order/${id}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: "Bearer " + state?.userInfo?.token,
+  //       },
+  //     });
+  //     const result = await response.json();
+  //     console.log("detail Order =", result.data);
+  //     updateStateLok({
+  //       destinationCoordss: [
+  //         parseFloat(result?.data.lng),
+  //         parseFloat(result?.data.lat),
+  //       ],
+  //     }),
+  //       setData(result.data);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // useEffect(() => {
+
+  //   getDetailOrder();
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log("longitudeOrder", longitudeOrder);
+  //   console.log("latitudeOrder", latitudeOrder);
+  //   getLokasiBengkel();
+  // }, []);
+
+  const getLokasiBengkel = async () => {
+    console.log(" get data track");
+    let isMounted = true;
     try {
-      const response = await fetch(`${baseUrl}/detail-order/${id}`, {
+      const response = await fetch(`${baseUrl}/tracking/${bengkel_id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -90,377 +189,418 @@ const DetailOrder = ({ navigation }) => {
         },
       });
       const result = await response.json();
-      console.log("detail Order =", result.data);
-      updateStateLok({
-        destinationCoords: {
-          latitude: parseFloat(result?.data.lat),
-          longitude: parseFloat(result?.data.lng),
-        },
-      }),
-        setData(result.data);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  useEffect(() => {
-    getDetailOrder();
-  }, []);
-
-  const getLiveLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    // console.log("status", status);
-    if (status !== "granted") {
-      console.log("Permission to access location was denied");
-      return;
-    }
-    console.log("getting location");
-    let currentLocation = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.Highest,
-      },
-      (loc) => {
-        console.log("lokasi terupdate order:", loc);
-        // result data =>lokasi terupdate order: {"coords": {"accuracy": 20, "altitude": 0, "altitudeAccuracy": 40, "heading": 0, "latitude": -7.464415, "longitude": 112.691165, "speed": 0}, "mocked": false, "timestamp": 1690650315351}
-        //  await AsyncStorage.setItem(
-        //    "userLocation",
-        //    JSON.stringify(loc.coords)
-        //  );
-        //  dispatch({ type: "SAVE_LOCATION", payload: loc.coords });
-        // changeAnimate(loc.coords.latitude, loc.coords.longitude);
-
+      if (result.success) {
+        await createRouterLine(
+          parseFloat(result?.data.lng),
+          parseFloat(result?.data.lat)
+        );
         updateStateLok({
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          coordinate: new AnimatedRegion({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }),
+          lokasiMontir: [
+            parseFloat(result?.data.lng),
+            parseFloat(result?.data.lat),
+          ],
+          heading: result?.data.heading,
         });
+        console.log("data posisi bengkel ==> ", result);
       }
-    );
-  };
-
-  // setLocation(currentLocation);
-
-  // console.log("curaatas",curlocation);
-  // try {
-  //   var curlocation = await Location.getCurrentPositionAsync({});
-  //   console.log("cur",curlocation);
-  // } catch {
-  //   curlocation = await Location.getCurrentPositionAsync({});
-  //   console.log(curlocation);aaa
-  // }
-  // useEffect(() => {
-  //   getLiveLocation();
-  // }, []);
-  // const { coords } = curlocation;
-
-  // if (coords) {
-  //   const { latitude, longitude } = coords;
-  // }
-  // updateStateLok();
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     getLiveLocation();
-  //   }, 7000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  const changeAnimate = (latitude, longitude) => {
-    const newCoordinate = { latitude, longitude };
-    if (Platform.OS == "android") {
-      if (markerRef.current) {
-        markerRef.current.animateMarkerToCoordinate(newCoordinate, 7000);
-      }
-    } else {
-      coordinate.timing(newCoordinate).start();
+    } catch (err) {
+      console.log("error track is :", err);
     }
   };
 
-  const getJarak = (newLatLng) => {
-    const { prevLatLng } = this.state;
-    return haversine(prevLatLng, newLatLng) || 0;
+  useEffect(() => {
+    getLokasiBengkel();
+
+    //   //   console.log("longitudeOrder", longitudeOrder);
+    //   //   console.log("latitudeOrder", latitudeOrder);
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(() => {
+        getLokasiBengkel();
+        isMounted = false;
+      }, 20000);
+    }
+  }, []);
+  // const handleButtonMulai = () => {
+  //   setButton(true);
+  //   if (!intervalRef.current) {
+  //     intervalRef.current = setInterval(() => {
+  //       getPermissionLocation();
+  //       isMounted = false;
+  //     }, 60000);
+  //   }
+  // };
+
+  const handleButtonSelesai = () => {
+    setButton(false);
+    console.log("button pressed");
+    console.log("interval ", intervalRef.current);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      console.log("interval delete ", intervalRef.current);
+    }
   };
 
-  const provinsi = useDaerah(data?.provinsi_id, "provinsi");
-  const kota = useDaerah(data?.kota_id, "kota");
-  const kecamatan = useDaerah(data?.kecamatan_id, "kecamatan");
-  const desa = useDaerah(data?.desa_id, "desa");
-
-  if (loading) {
-    return (
-      <ActivityIndicator
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        size="large"
-        color={Color.primary}
-      />
-    );
-  }
-  const handleClickMarker = (e) => {
-    console.log(e.nativeEvent);
-  };
-
-  const handleZoomIn = () => {
-    updateStateLok({
-      latitude: latitude,
-      longitude: longitude,
-      latitudeDelta: latitudeDelta / 2,
-      longitudeDelta: longitudeDelta / 2,
-    });
-    mapRef.current.animateToRegion(
-      {
-        latitude: latitude,
-        longitude: longitude,
-        latitudeDelta: latitudeDelta / 2,
-        longitudeDelta: longitudeDelta / 2,
-      },
-      100
-    );
-  };
-
-  const handleZoomOut = () => {
-    updateStateLok({
-      latitude: latitude,
-      longitude: longitude,
-      latitudeDelta: latitudeDelta * 2,
-      longitudeDelta: longitudeDelta * 2,
-    });
-    mapRef.current.animateToRegion(
-      {
-        latitude: latitude,
-        longitude: longitude,
-        latitudeDelta: latitudeDelta * 2,
-        longitudeDelta: longitudeDelta * 2,
-      },
-      100
-    );
-  };
-
-  console.log("destionation", destinationCoords);
-  // const origin = { latitude: 37.3318456, longitude: -122.0296002 };
-  // const destination = { latitude: 37.771707, longitude: -122.4053769 };
-  console.log("userinfo lokasi", state?.userLocation);
-  return (
-    <>
-      <Stack
-        screenOptions={{
-          headerTitle: "Detail",
-          headerStyle: {
-            backgroundColor: "#fff",
+  useEffect(() => {
+    return () => {
+      isMounted = false;
+      handleButtonSelesai();
+    };
+  }, []);
+  function makeRouterFeature(coordinates) {
+    let routerFeature = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: coordinates,
           },
-          headerTintColor: "#fff",
-          gestureEnabled: false,
-          headerShown: false,
-          headerLeft: () => <></>,
+        },
+      ],
+    };
+    return routerFeature;
+  }
+
+  const createRouterLine = async (lng, lat) => {
+    // const startCoords = `${coords[0]},${coords[1]}`;
+    const startCoords = `${lng},${lat}`;
+    const endCoords = `${lokasiUser[0]},${lokasiUser[1]}`;
+    console.log("start :", startCoords);
+    // console.log("coord :", coords);
+    // console.log("end :", endCoords);
+    const geometries = "geojson";
+    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoords};${endCoords}?alternatives=true&geometries=${geometries}&steps=true&banner_instructions=true&overview=full&voice_instructions=true&access_token=${APIKEY}`;
+
+    try {
+      let response = await fetch(url);
+      let json = await response.json();
+      console.log("result mapbox:", json);
+      const dataResult = json.routes.map((dataResult) => {
+        console.log(dataResult);
+        setDistance((dataResult.distance / 1000).toFixed(2));
+        setDuration((dataResult.duration / 3600).toFixed(2));
+      });
+
+      let coordinates = json["routes"][0]["geometry"]["coordinates"];
+      let destinationCoordinates =
+        json["routes"][0]["geometry"]["coordinates"].slice(-1)[0];
+      // console.log("slice ", destinationCoordinates);
+      // setRo(destinationCoordinates);
+      // console.log("desti", destinationCoordinates);
+      updateStateLok({
+        routeCordinates: destinationCoordinates,
+      });
+      if (coordinates.length) {
+        const routerFeature = makeRouterFeature([...coordinates]);
+        setRouteDirections(routerFeature);
+      }
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
+  };
+
+  // console.log("route cordinates", routeCordinates);
+  // const renderItem = ({ item }) => (
+  //   <TouchableOpacity
+  //     style={[
+  //       styles.routeProfileButton,
+  //       item.id == selectedRouteProfile && styles.selectedRouteProfileButton,
+  //     ]}
+  //     onPress={() => setselectedRouteProfile(item.id)}
+  //   >
+  //     <Icon
+  //       name={item.icon}
+  //       size={24}
+  //       color={
+  //         item.id == selectedRouteProfile ? "white" : "rgba(255,255,255,0.6)"
+  //       }
+  //     />
+  //     <Text
+  //       style={[
+  //         styles.routeProfileButtonText,
+  //         item.id == selectedRouteProfile &&
+  //           styles.selectedRouteProfileButtonText,
+  //       ]}
+  //     >
+  //       {item.label}
+  //     </Text>
+  //   </TouchableOpacity>
+  // );
+
+  // console.log("type data routecordinates: ", routeCord`inates);
+  return (
+    <View style={styles.container}>
+      <Mapbox.MapView
+        style={styles.map}
+        scaleBarEnabled={false}
+        onPress={(e) => console.log(e)}
+        compassEnabled={true}
+        zoomEnabled={true}
+        // styleURL="mapbox://styles/mapbox/streets-v12"
+        styleURL="mapbox://styles/mapbox/navigation-day-v1"
+        // styleURL="mapbox://styles/mapbox/navigation-night-v1"
+        // rotateEnabled={true}
+        onDidFinishLoadingMap={async () => {
+          await createRouterLine(data?.lng, data?.lat);
+          // await createRouterLine(coords, selectedRouteProfile);
         }}
-      />
-
-      <View style={[styles.container, { paddingBottom: 20 }]}>
-        <View style={styles.boxImage}>
-          <MapView
-            style={styles.map}
-            showsTraffic
-            ref={mapRef}
-            zoomEnabled={true}
-            scrollEnabled={true}
-            showsScale={true}
-            followsUserLocation
-            initialRegion={{
-              latitude,
-              longitude,
-              latitudeDelta: latitudeDelta,
-              longitudeDelta: longitudeDelta,
-            }}
-            showsUserLocation
-          >
-            <Polyline
-              coordinates={[
-                { latitude: latitude, longitude: longitude },
-                destinationCoords,
-              ]}
-              strokeColor="red" // fallback for when `strokeColors` is not supported by the map-provider
-              strokeColors={[
-                "#7F0000",
-                // "#00000000", // no color, creates a "long" gradient between the previous and next coordinate
-              ]}
-              strokeWidth={6}
+      >
+        <Mapbox.Camera
+          zoomLevel={12}
+          centerCoordinate={lokasiUser}
+          animationMode={"flyTo"}
+          animationDuration={6000}
+        />
+        {routeDirections && (
+          <Mapbox.ShapeSource id="line1" shape={routeDirections}>
+            <Mapbox.LineLayer
+              id="routerLine01"
+              style={{
+                lineColor: Color.primary,
+                lineWidth: 4,
+              }}
             />
-            <Marker.Animated ref={markerRef} coordinate={coordinate} />
-
-            {Object.keys(destinationCoords).length > 0 && (
-              <Marker
-                coordinate={destinationCoords}
-                title="user location"
-
-                // image={imagePath.icGreenMarker}
+          </Mapbox.ShapeSource>
+        )}
+        {console.log(coords, "ini coords")}
+        {console.log(lokasiUser, "ini lokasiUser")}
+        {lokasiUser && (
+          <Mapbox.MarkerView id="destinationPoint" coordinate={lokasiUser}>
+            <Mapbox.Callout title="Lokasi anda" />
+            <View style={styles.destinationIcon}>
+              <SimpleIcon
+                name="location-pin"
+                size={24}
+                color={Color.secondaryColor}
               />
-            )}
-          </MapView>
-          {/* <WebView
-            originWhitelist={["*"]}
-            source={{ uri: "./leaflet.js" }}
-            style={{ flex: 1 }}
-          /> */}
-          {/* <WebView
-            source={{ uri: "http://192.168.43.175:8000/order/118" }}
-            style={{ flex: 1 }}
-          /> */}
-          <View style={styles.buttonZoomInOut}>
-            <Text onPress={() => handleZoomIn()} style={styles.plusMinButton}>
-              +
-            </Text>
-            <Text onPress={() => handleZoomOut()} style={styles.plusMinButton}>
-              -
-            </Text>
-          </View>
-        </View>
-        <View style={{ height: 400 }}>
-          <View style={styles.title}>
-            <Text style={styles.textTitle}>
-              Detail Order: ORDERB3N600{data?.id}
-            </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text>Pemesan :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {state?.userInfo?.user.name}
-            </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text>Nama Bengkel :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {data?.bengkel?.nama_bengkel}
-            </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text>Email Bengkel :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {data?.bengkel?.email}
-            </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text>Kontak Bengkel :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {data?.bengkel?.no_hp}
-            </Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text>Tanggal :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {data?.tanggal}
-            </Text>
-          </View>
-          <View style={[styles.itemWrapp, { alignItems: "center" }]}>
-            <Text>Status :</Text>
-            <Text
+            </View>
+          </Mapbox.MarkerView>
+        )}
+
+        {lokasiMontir && (
+          <Mapbox.MarkerView id="montirLokasi" coordinate={lokasiMontir}>
+            <View style={styles.destinationIcon}>
+              {/* <Icon name="user-circle" size={24} color="#E1710A" /> */}
+              <Image
+                source={require("../assets/img/iconmotor.png")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  transform: [{ rotate: `${heading}deg` }],
+                }}
+                resizeMode="cover"
+              />
+            </View>
+          </Mapbox.MarkerView>
+        )}
+        {/* <Mapbox.UserLocation
+          visible={true}
+          animated={true}
+          customMarker={
+            <Image
+              source={customUserLocationIcon}
+              style={{ width: 24, height: 24 }}
+            />
+          }
+          onUpdate={(location) => {
+            // Handle pembaruan lokasi pengguna di sini
+            console.log("ini user loction", location);
+          }}
+          androidRenderMode="normal"
+          // showsUserHeadingIndicator={true}
+        /> */}
+      </Mapbox.MapView>
+      {/* <FlatList
+        data={routeProfiles}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        contentContainerStyle={styles.routeProfileList}
+        showsHorizontalScrollIndicator={false}
+        style={styles.flatList}
+      /> */}
+
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <FontAwesome5 name="arrow-left" size={24} color="#ffffff" />
+      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color="white"
+          style={styles.loadingIndicator}
+        />
+      ) : (
+        routeDirections && (
+          <View style={styles.cardContainer}>
+            <View
               style={[
-                styles.status,
+                styles.card,
                 {
-                  backgroundColor:
-                    data?.status === "Diproses"
-                      ? "orange"
-                      : data?.status === "Ditolak"
-                      ? "red"
-                      : "green",
+                  backgroundColor: button === true ? "#00AA13" : Color.primary,
                 },
               ]}
             >
-              {data?.status}
-            </Text>
+              <Text style={styles.title}>Estimasi montir tiba </Text>
+              <Text style={styles.content}>{duration} jam</Text>
+              <Text style={styles.title}>Jarak</Text>
+              <Text style={styles.content}>{distance} km</Text>
+            </View>
           </View>
-          <View style={[styles.itemWrapp, { marginBottom: 20 }]}>
-            <Text>Keterangan status :</Text>
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              {data?.keterangan ?? "-"}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </>
+        )
+      )}
+      <TouchableOpacity
+        style={styles.buttonMulai}
+        onPress={() => handleButtonSelesai()}
+      >
+        <Text
+          style={[
+            styles.textButtonMulai,
+            {
+              backgroundColor: button === true ? "#00AA13" : Color.primary, // Ganti backgroundColor dengan properti yang benar
+            },
+          ]}
+        >
+          Selesai
+        </Text>
+      </TouchableOpacity>
+      {/* {button === false ? (
+        <TouchableOpacity
+          style={styles.buttonMulai}
+          onPress={() => handleButtonMulai()}
+        >
+          <Text style={styles.textButtonMulai}>Berangkat</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.buttonMulai}
+          onPress={() => handleButtonSelesai()}
+        >
+          <Text style={styles.textButtonSelesai}>Selesai</Text>
+        </TouchableOpacity>
+      )} */}
+    </View>
   );
 };
-
-export default DetailOrder;
+export default DetailOrderBengkel;
 
 const styles = StyleSheet.create({
   container: {
-    fontSize: 16,
     flex: 1,
   },
-  boxImage: {
-    // width: 50,
-    // marginTop: 20,
-    height: 370,
-    backgroundColor: "#fff",
-  },
-  image: {
-    objectFit: "cover",
-    width: "100%",
-    height: 270,
-    // borderRadius: 200,
-    // borderRadius: 10,
-  },
   map: {
-    height: 370,
+    flex: 1,
   },
-  itemWrapp: {
-    // justifyContent: "space-between",
-    flexDirection: "row",
+  card: {
+    backgroundColor: Color.secondaryColor,
     paddingHorizontal: 10,
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    paddingVertical: 6,
-    gap: 8,
-    // shadowProp: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    // },
-  },
-  itemText: {
-    fontSize: 16,
-  },
-  icon: {
-    marginRight: 10,
-  },
-
-  status: {
-    backgroundColor: "green",
-    borderRadius: 20,
-    textAlign: "center",
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    color: "#fff",
-    fontWeight: "bold",
+    gap: 3,
+    borderRadius: 8,
   },
   title: {
-    backgroundColor: "white",
+    color: "#fff",
+  },
+  content: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 10,
+    zIndex: 1,
+    backgroundColor: "rgba(0, 0 ,0 , 0.5)",
+    borderRadius: 20,
     padding: 8,
   },
-  textTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  buttonZoomInOut: {
+  loadingIndicator: {
     position: "absolute",
-    width: 24,
-    right: 0,
-    bottom: 0,
-    marginRight: 10,
-    marginBottom: 10,
-    gap: 1,
+    top: "50%",
+    left: "50%",
+    zIndex: 2,
   },
-  plusMinButton: {
-    padding: 2,
+  cardContainer: {
+    position: "absolute",
+    top: 50,
+    right: 10,
+    zIndex: 1,
+  },
+
+  destinationIcon: {
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  routeProfileList: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: "transparent",
+    zIndex: 1,
+  },
+  flatList: {
+    position: "absolute",
+    bottom: 20,
+    left: Dimensions.get("window").width / 2 - 40,
+    right: 0,
+    backgroundColor: "transparent",
+    zIndex: 1,
+  },
+  buttonMulai: {
+    position: "absolute",
+    bottom: 0,
+    padding: 10,
+    width: "100%",
+  },
+  textButtonMulai: {
+    color: "#fff",
+    backgroundColor: "#00AA13",
+    paddingHorizontal: 10,
+    paddingVertical: 12,
     textAlign: "center",
-    fontWeight: "bold",
-    backgroundColor: "#fff",
-    color: "#000",
-    fontSize: 18,
-    elevation: 2,
+    fontSize: 22,
+    borderRadius: 50,
+    fontWeight: 600,
+  },
+  textButtonSelesai: {
+    color: "#fff",
+    backgroundColor: "#00AA13",
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    textAlign: "center",
+    fontSize: 22,
+    borderRadius: 50,
+    fontWeight: 600,
+  },
+  routeProfileButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginHorizontal: 8,
+    borderColor: "#fff",
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+  },
+  selectedRouteProfileButton: {
+    backgroundColor: "#FA9E14",
+    borderColor: "#FA9E14",
+  },
+  routeProfileButtonText: {
+    color: "#fff",
+    marginTop: 5,
+  },
+  selectedRouteProfileButtonText: {
+    color: "white",
   },
 });

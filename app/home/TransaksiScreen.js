@@ -42,7 +42,7 @@ const TransaksiScreen = () => {
       });
       console.log("selesai");
       const result = await response.json();
-      console.log("result order : ", result?.data);
+      console.log("result transaksi : ", result?.data);
       console.log("selesai2");
       setData(result.data);
       setLoading(false);
@@ -84,9 +84,22 @@ const TransaksiScreen = () => {
               style={{ gap: 8 }}
               key={index}
               // onPress={() => router.push("/DetailOrderBengkel")}
-              onPress={() =>
-                router.push("/DetailOrderBengkel00/?id=" + item.id)
-              }
+              onPress={() => {
+                if (state?.userInfo?.user?.tipe_user === "User") {
+                  router.push(
+                    "/DetailOrderUser/?id=" +
+                      item.id +
+                      "&bengkel_id=" +
+                      item.bengkel_id +
+                      "&longitudeOrder=" +
+                      item.lng +
+                      "&latitudeOrder=" +
+                      item.lat
+                  );
+                } else {
+                  router.push("/DetailOrderBengkel/?id=" + item.id);
+                }
+              }}
               // onPress={() => router.push("/DetailOrder/?id=" + item.id)}
             >
               <View style={styles.box}>

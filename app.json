@@ -13,7 +13,7 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ],
-       [
+      [
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox",
@@ -39,8 +39,8 @@
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyAuYand6-drJrEpJfHdPogNWyGevtUM5IQ"
+        }
       }
-    }
     },
     "extra": {
       "eas": {
@@ -49,6 +49,7 @@
     },
     "ios": {
       "bundleIdentifier": "no"
-    }
+    },
+    "owner": "adam_webdev"
   }
 }

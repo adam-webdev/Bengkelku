@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import React, { useState, useEffect } from "react";
-import { useStateContext } from "./Store";
+import { useStateContext, baseUrl } from "./Store";
 
 const useDaerah = (id, name) => {
   const [data, setData] = useState([]);
@@ -14,19 +14,16 @@ const useDaerah = (id, name) => {
     //   : state?.userInfo?.user?.token;
     setLoading(true);
     try {
-      const res = await fetch(
-        `http://192.168.43.175:8000/api/v1/nama-daerah/${name}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + state?.userInfo?.token,
-          },
-          body: JSON.stringify({
-            id: id,
-          }),
-        }
-      );
+      const res = await fetch(`${baseUrl}/nama-daerah/${name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+        body: JSON.stringify({
+          id: id,
+        }),
+      });
       const result = await res.json();
       console.log("userdaerah", result?.data[0].name);
       setData(result.data[0]);

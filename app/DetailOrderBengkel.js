@@ -8,7 +8,7 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import UserLocationIcon from "../assets/img/iconmotor.png";
+import customUserLocationIcon from "../assets/img/iconmotor.png";
 import * as Location from "expo-location";
 import Octicons from "@expo/vector-icons/Octicons";
 import React, { useState, useEffect, useRef } from "react";
@@ -24,7 +24,8 @@ import Mapbox from "@rnmapbox/maps";
 import { useNavigation, useRoute } from "@react-navigation/native";
 // import {APIKEY} from '../utils/key';
 import ColorfulCard from "@freakycoder/react-native-colorful-card";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import SimpleIcon from "react-native-vector-icons/SimpleLineIcons";
 import Ionicons from "react-native-vector-icons/MaterialIcons";
 
 // Logger.setLogCallback((log) => {
@@ -74,6 +75,7 @@ const DetailOrderBengkel = () => {
   const { state } = useStateContext();
   const [location, setLocation] = useState([]);
   const [button, setButton] = useState(false);
+  const [statusOrder, setStatusOrder] = useState();
   const router = useRouter();
 
   const intervalRef = useRef(null);
@@ -86,13 +88,19 @@ const DetailOrderBengkel = () => {
   const [stateLok, setStateLok] = useState({
     latitude: "",
     longitude: "",
+    heading: 90,
     // coords: [12.48839, 50.72724],
     coords: [state?.userLocation?.longitude, state?.userLocation?.latitude],
     // coords: [-7.379778, 112.639269],
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
     routeCordinates: [-7.379778, 112.639269],
-    destinationCoordss: [-7.379778, 112.639269],
+    lokasiUser: [-7.379778, 112.639269],
+    lokasiMontir: [
+      state?.userLocation?.longitude,
+      state?.userLocation?.latitude,
+    ],
+
     // destinationCoordss: [-7.379897793082899, 112.63985632918775],
 
     jarakDriver: 0,
@@ -102,11 +110,13 @@ const DetailOrderBengkel = () => {
   const {
     latitude,
     longitude,
+    heading,
     routeCordinates,
     jarakDriver,
     prevLatLng,
     coords,
-    destinationCoordss,
+    lokasiUser,
+    lokasiMontir,
     latitudeDelta,
     longitudeDelta,
   } = stateLok;
@@ -130,7 +140,15 @@ const DetailOrderBengkel = () => {
     });
 
     if (intervalRef.current) {
+      updateStateLok({
+        heading: curlocation?.coords.heading,
+        lokasiMontir: [
+          curlocation?.coords.longitude,
+          curlocation?.coords.latitude,
+        ],
+      });
       await sendDataTrack(
+        curlocation?.coords.heading,
         curlocation?.coords.longitude,
         curlocation?.coords.latitude
       );
@@ -237,12 +255,30 @@ const DetailOrderBengkel = () => {
       const result = await response.json();
       console.log("detail Order =", result.data);
       updateStateLok({
-        destinationCoordss: [
+        lokasiUser: [
           parseFloat(result?.data.lng),
           parseFloat(result?.data.lat),
         ],
       }),
         setData(result.data);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const orderStatusUpdate = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${baseUrl}/order-status-update/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + state?.userInfo?.token,
+        },
+      });
+      const result = await response.json();
+      console.log("detail Order =", result.data);
+      setStatusOrder(result.data);
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -256,7 +292,7 @@ const DetailOrderBengkel = () => {
     getPermissionLocation();
   }, []);
 
-  const sendDataTrack = async (lng, lat) => {
+  const sendDataTrack = async (heading, lng, lat) => {
     console.log("mulai post data track");
     try {
       const response = await fetch(`${baseUrl}/tracking`, {
@@ -267,6 +303,7 @@ const DetailOrderBengkel = () => {
         },
         body: JSON.stringify({
           bengkel_id: data?.bengkel_id,
+          heading,
           lng,
           lat,
         }),
@@ -324,7 +361,7 @@ const DetailOrderBengkel = () => {
   const createRouterLine = async (lng, lat) => {
     // const startCoords = `${coords[0]},${coords[1]}`;
     const startCoords = `${lng},${lat}`;
-    const endCoords = `${destinationCoordss[0]},${destinationCoordss[1]}`;
+    const endCoords = `${lokasiUser[0]},${lokasiUser[1]}`;
     console.log("start :", startCoords);
     // console.log("coord :", coords);
     // console.log("end :", endCoords);
@@ -412,7 +449,7 @@ const DetailOrderBengkel = () => {
       >
         <Mapbox.Camera
           zoomLevel={12}
-          centerCoordinate={coords}
+          centerCoordinate={lokasiMontir}
           animationMode={"flyTo"}
           animationDuration={6000}
         />
@@ -428,27 +465,53 @@ const DetailOrderBengkel = () => {
           </Mapbox.ShapeSource>
         )}
         {console.log(coords, "ini coords")}
-        {console.log(destinationCoordss, "ini destinationCoordss")}
-        {destinationCoordss && (
-          <Mapbox.PointAnnotation
-            id="destinationPoint"
-            coordinate={destinationCoordss}
-          >
+        {console.log(lokasiUser, "ini lokasiUser")}
+        {lokasiUser && (
+          <Mapbox.MarkerView id="destinationPoint" coordinate={lokasiUser}>
+            <Mapbox.Callout title="Lokasi anda" />
             <View style={styles.destinationIcon}>
-              <Icon name="user-circle" size={24} color="#E1710A" />
+              <SimpleIcon
+                name="location-pin"
+                size={24}
+                color={Color.secondaryColor}
+              />
             </View>
-          </Mapbox.PointAnnotation>
+          </Mapbox.MarkerView>
         )}
-        <Mapbox.UserLocation
+
+        {lokasiMontir && (
+          <Mapbox.MarkerView id="montirLokasi" coordinate={lokasiMontir}>
+            <View style={styles.destinationIcon}>
+              {/* <Icon name="user-circle" size={24} color="#E1710A" /> */}
+              <Image
+                source={require("../assets/img/iconmotor.png")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  transform: [{ rotate: `${heading}deg` }],
+                }}
+                resizeMode="cover"
+              />
+            </View>
+          </Mapbox.MarkerView>
+        )}
+
+        {/* <Mapbox.UserLocation
           visible={true}
           animated={true}
+          customMarker={
+            <Image
+              source={customUserLocationIcon}
+              style={{ width: 24, height: 24 }}
+            />
+          }
           onUpdate={(location) => {
             // Handle pembaruan lokasi pengguna di sini
             console.log("ini user loction", location);
           }}
           androidRenderMode="normal"
           showsUserHeadingIndicator={true}
-        />
+        /> */}
       </Mapbox.MapView>
       {/* <FlatList
         data={routeProfiles}
@@ -464,7 +527,7 @@ const DetailOrderBengkel = () => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-left" size={24} color="#ffffff" />
+        <FontAwesome5 name="arrow-left" size={24} color="#ffffff" />
       </TouchableOpacity>
       {loading ? (
         <ActivityIndicator
@@ -502,7 +565,9 @@ const DetailOrderBengkel = () => {
       ) : (
         <TouchableOpacity
           style={styles.buttonMulai}
-          onPress={() => handleButtonSelesai()}
+          onPress={() => {
+            handleButtonSelesai(), orderStatusUpdate();
+          }}
         >
           <Text style={styles.textButtonSelesai}>Selesai</Text>
         </TouchableOpacity>
@@ -523,7 +588,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.secondaryColor,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    gap: 4,
+    gap: 3,
     borderRadius: 8,
   },
   title: {

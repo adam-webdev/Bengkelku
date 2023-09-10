@@ -5,6 +5,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import * as Location from "expo-location";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -100,111 +101,117 @@ const DetailProfil = ({ navigation }) => {
           headerLeft: () => <></>,
         }}
       />
-      <View style={styles.container}>
-        <View style={styles.boxImage}>
-          {data?.foto ? (
-            <Image style={styles.image} source={{ uri: data?.foto }} />
-          ) : (
-            <Image
-              style={styles.image}
-              source={require("../assets/img/bengkel.jpg")}
-            />
-          )}
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
-            {data?.name}
-          </Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={styles.boxImage}>
+            {data?.foto ? (
+              <Image style={styles.image} source={{ uri: data?.foto }} />
+            ) : (
+              <Image
+                style={styles.image}
+                source={require("../assets/img/bengkel.jpg")}
+              />
+            )}
+            <Text style={{ fontSize: 18, fontWeight: "bold", marginTop: 10 }}>
+              {data?.name}
+            </Text>
 
-          <Text>
-            {data?.tipe_user === "Admin Bengkel" ? "(User Bengkel)" : "(User)"}
-          </Text>
-        </View>
-        <View style={{ backgroundColor: "#fff" }}>
-          <Text
-            style={{
-              fontSize: 16,
-              marginBottom: 5,
-              fontWeight: "bold",
-              padding: 10,
-            }}
-          >
-            Detail :
-          </Text>
-          <View style={styles.itemWrapp}>
-            <Foundation
-              size={26}
-              style={styles.icon}
-              name="telephone"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}> {data?.no_hp}</Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <MaterialCommunityIcons
-              size={26}
-              style={styles.icon}
-              name="email"
-              color={Color.primary}
-            />
-            <Text style={styles.itemText}> {data?.email} </Text>
-          </View>
-          <View style={[styles.itemWrapp, { alignItems: "center" }]}>
-            <IonIcons
-              size={26}
-              style={styles.icon}
-              name="location"
-              color={Color.primary}
-            />
-            <Text style={[styles.itemText, { fontWeight: "bold" }]}>
-              Lokasi saat ini :
+            <Text>
+              {data?.tipe_user === "Admin Bengkel"
+                ? "(User Bengkel)"
+                : "(User)"}
             </Text>
           </View>
-          {/* city": "Kecamatan Sidoarjo", "country": "Indonesia", "district":
+          <View style={{ backgroundColor: "#fff" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: 5,
+                fontWeight: "bold",
+                padding: 10,
+              }}
+            >
+              Detail :
+            </Text>
+            <View style={styles.itemWrapp}>
+              <Foundation
+                size={26}
+                style={styles.icon}
+                name="telephone"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}> {data?.no_hp}</Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <MaterialCommunityIcons
+                size={26}
+                style={styles.icon}
+                name="email"
+                color={Color.primary}
+              />
+              <Text style={styles.itemText}> {data?.email} </Text>
+            </View>
+            <View style={[styles.itemWrapp, { alignItems: "center" }]}>
+              <IonIcons
+                size={26}
+                style={styles.icon}
+                name="location"
+                color={Color.primary}
+              />
+              <Text style={[styles.itemText, { fontWeight: "bold" }]}>
+                Lokasi saat ini :
+              </Text>
+            </View>
+            {/* city": "Kecamatan Sidoarjo", "country": "Indonesia", "district":
           "Sidokumpul", "isoCountryCode": "ID", "name": "8E", "postalCode":
           "61213", "region": "Jawa Timur", "street": "Jalan Diponegoro",
           "streetNumber": "8E", "subregion": "Kabupaten Sidoarjo", "timezone":
           null} */}
-          <View style={styles.itemWrapp}>
-            <Text style={[styles.itemText, { width: "25%" }]}>Desa </Text>
-            <Text style={styles.itemText}>: {locationUser?.district}</Text>
+            <View style={styles.itemWrapp}>
+              <Text style={[styles.itemText, { width: "25%" }]}>Desa </Text>
+              <Text style={styles.itemText}>: {locationUser?.district}</Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <Text style={[styles.itemText, { width: "25%" }]}>
+                Kecamatan{" "}
+              </Text>
+              <Text style={styles.itemText}>: {locationUser?.city}</Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <Text style={[styles.itemText, { width: "25%" }]}>Kota </Text>
+              <Text style={styles.itemText}>: {locationUser?.subregion}</Text>
+            </View>
+            <View style={styles.itemWrapp}>
+              <Text style={[styles.itemText, { width: "25%" }]}>Provinsi </Text>
+              <Text style={styles.itemText}>: {locationUser?.region}</Text>
+            </View>
+            <View style={styles.itemWrapp}></View>
           </View>
-          <View style={styles.itemWrapp}>
-            <Text style={[styles.itemText, { width: "25%" }]}>Kecamatan </Text>
-            <Text style={styles.itemText}>: {locationUser?.city}</Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text style={[styles.itemText, { width: "25%" }]}>Kota </Text>
-            <Text style={styles.itemText}>: {locationUser?.subregion}</Text>
-          </View>
-          <View style={styles.itemWrapp}>
-            <Text style={[styles.itemText, { width: "25%" }]}>Provinsi </Text>
-            <Text style={styles.itemText}>: {locationUser?.region}</Text>
-          </View>
-          <View style={styles.itemWrapp}></View>
-        </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            router.push({
-              pathname: "/EditProfile",
-              params: { id: data?.id },
-            })
-          }
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              color: "#fff",
-              fontSize: 18,
-            }}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              router.push({
+                pathname: "/EditProfile",
+                params: { id: data?.id },
+              })
+            }
           >
-            Edit Profile
-          </Text>
-          <Octicons
-            name="chevron-right"
-            style={{ color: "#fff", fontSize: 20 }}
-          />
-        </TouchableOpacity>
-      </View>
+            <Text
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                fontSize: 18,
+              }}
+            >
+              Edit Profile
+            </Text>
+            <Octicons
+              name="chevron-right"
+              style={{ color: "#fff", fontSize: 20 }}
+            />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </>
   );
 };
