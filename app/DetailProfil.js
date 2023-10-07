@@ -28,6 +28,8 @@ const DetailProfil = ({ navigation }) => {
   const { state } = useStateContext();
   const [locationUser, setLocationUser] = useState();
   const router = useRouter();
+  console.log("Id", id);
+
   const getDetailProfil = async () => {
     setLoading(true);
     try {
@@ -38,7 +40,9 @@ const DetailProfil = ({ navigation }) => {
           Authorization: "Bearer " + state?.userInfo?.token,
         },
       });
+      console.log("cek", response);
       const result = await response.json();
+      console.log("finish");
       console.log("profil =", result.data);
       setData(result.data);
       setLoading(false);
@@ -63,6 +67,8 @@ const DetailProfil = ({ navigation }) => {
   };
   useEffect(() => {
     getDetailProfil();
+  }, []);
+  useEffect(() => {
     reverseGeocodeUser();
   }, []);
   const provinsi = useDaerah(data?.provinsi_id, "provinsi");

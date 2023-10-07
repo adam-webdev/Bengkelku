@@ -49,11 +49,14 @@ const ExploreScreen = () => {
   const ASPECT_RATIO = screen.width / screen.height;
   const LATITUDE_DELTA = 0.05;
   const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+  const myLocation = state?.userLocation.latitude
+    ? [state?.userLocation?.longitude, state?.userLocation?.latitude]
+    : [-7.379778, 112.639269];
 
   const [region, setRegion] = useState({
     latitude: state?.userLocation?.latitude,
     longitude: state?.userLocation?.longitude,
-    coords: [state?.userLocation?.longitude, state?.userLocation?.latitude],
+    coords: myLocation,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });

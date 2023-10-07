@@ -217,7 +217,7 @@ const DetailOrderBengkel = () => {
       intervalRef.current = setInterval(() => {
         getLokasiBengkel();
         isMounted = false;
-      }, 20000);
+      }, 60000);
     }
   }, []);
   // const handleButtonMulai = () => {
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     textAlign: "center",
     fontSize: 22,
-    borderRadius: 50,
+    borderRadius: 8,
     fontWeight: 600,
   },
   textButtonSelesai: {

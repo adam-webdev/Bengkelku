@@ -107,11 +107,23 @@ const TransaksiScreen = () => {
                 <View style={{ gap: 8 }}>
                   <Text style={styles.name}>ORDERB3N600{item?.id}</Text>
                   {state?.userInfo?.user?.tipe_user === "User" ? (
-                    <Text style={{ fontSize: 18 }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                      }}
+                    >
                       {item?.bengkel?.nama_bengkel}
                     </Text>
                   ) : (
-                    <Text style={{ fontSize: 18 }}>{item?.user?.name}</Text>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {item?.user?.name}
+                    </Text>
                   )}
                   <Text style={{ fontSize: 16 }}>{item?.tanggal}</Text>
                 </View>

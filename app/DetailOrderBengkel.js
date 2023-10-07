@@ -167,81 +167,7 @@ const DetailOrderBengkel = () => {
       setLocation(curlocation.coords);
     }
   };
-  // const { store } = route.params;
-  // console.log(coords)
-  // const getLiveLocation = async () => {
-  //   // let { status } = await Location.requestForegroundPermissionsAsync();
-  //   // // console.log("status", status);
-  //   // if (status !== "granted") {
-  //   //   console.log("Permission to access location was denied");
-  //   //   return;
-  //   // }
-  //   console.log("getting location");
-  //   let currentLocation = await Location.watchPositionAsync(
-  //     {
-  //       accuracy: Location.Accuracy.Highest,
-  //       // maximumAge: 1000,
-  //     },
-  //     (loc) => {
-  //       // console.log("lokasi terupdate order:", loc);
-  //       // result data =>lokasi terupdate order: {"coords": {"accuracy": 20, "altitude": 0, "altitudeAccuracy": 40, "heading": 0, "latitude": -7.464415, "longitude": 112.691165, "speed": 0}, "mocked": false, "timestamp": 1690650315351}
 
-  //       // changeAnimate(loc.coords.latitude, loc.coords.longitude);
-  //       sendDataTrack(loc.coords.longitude, loc.coords.latitude);
-
-  //       updateStateLok({
-  //         latitude: loc.coords.latitude,
-  //         longitude: loc.coords.longitude,
-  //       });
-
-  //       updateStateLok({
-  //         coords: [loc.coords.longitude, loc.coords.latitude],
-  //       });
-  //     }
-  //   );
-  // };
-  // console.log("lt", data?.lat);
-  // console.log("lg", data?.lng);
-  // async function getPermissionLocation() {
-  //   try {
-  //     const geo = await Geolocation.getCurrentPosition(
-  //       (location) =>
-  //         setCoords([location.coords.longitude, location.coords.latitude]),
-  //       (err) => console.log(err),
-  //       { enableHighAccuracy: true }
-  //     );
-  //   } catch (error) {
-  //     console.error("Error getting location", error);
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   intervalRef.current = setInterval(() => {
-  //     // getLiveLocation();
-  //     getPermissionLocation();
-  //   }, 20000);
-  // }, []);
-
-  // console.log(intervalRef.current)
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (button) {
-  //       console.log("ini dalam interval", latitude, longitude);
-  //       // getLiveLocation();
-  //       sendDataTrack();
-  //     }
-  //   }, 20000);
-  //   if (button === false) {
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [button]);
-
-  // useEffect(() => {
-  //   //console.log(store.longitude);
-  //   if (selectedRouteProfile !== null) {
-  //     createRouterLine(coords, selectedRouteProfile);
-  //   }
-  // }, [selectedRouteProfile]);
   const getDetailOrder = async () => {
     setLoading(true);
     try {
@@ -543,7 +469,9 @@ const DetailOrderBengkel = () => {
                 styles.card,
                 {
                   backgroundColor:
-                    button === false ? Color.secondaryColor : "#00AA13", // Ganti backgroundColor dengan properti yang benar
+                    button === false && data?.status !== "Selesai"
+                      ? Color.primaryS
+                      : "#00AA13", // Ganti backgroundColor dengan properti yang benar
                 },
               ]}
             >
@@ -555,7 +483,7 @@ const DetailOrderBengkel = () => {
           </View>
         )
       )}
-      {button === false ? (
+      {button === false && data?.status !== "Selesai" ? (
         <TouchableOpacity
           style={styles.buttonMulai}
           onPress={() => handleButtonMulai()}
@@ -585,11 +513,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: Color.secondaryColor,
+    backgroundColor: Color.primaryS,
     paddingHorizontal: 10,
     paddingVertical: 10,
     gap: 3,
     borderRadius: 8,
+    color: Color.primary,
   },
   title: {
     color: "#fff",
@@ -649,12 +578,12 @@ const styles = StyleSheet.create({
   },
   textButtonMulai: {
     color: "#fff",
-    backgroundColor: Color.secondaryColor,
+    backgroundColor: Color.primary,
     paddingHorizontal: 10,
     paddingVertical: 12,
     textAlign: "center",
     fontSize: 22,
-    borderRadius: 50,
+    borderRadius: 8,
     fontWeight: 600,
   },
   textButtonSelesai: {
@@ -664,7 +593,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     textAlign: "center",
     fontSize: 22,
-    borderRadius: 50,
+    borderRadius: 8,
     fontWeight: 600,
   },
   routeProfileButton: {
