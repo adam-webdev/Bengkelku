@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useStateContext, storeData, baseUrl } from "./../hooks/Store";
 import Octicons from "@expo/vector-icons/Octicons";
+import MaterialIcon from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,6 +21,7 @@ const TransaksiScreen = () => {
   // console.log("test", state.userInfo);
   // const { id } = useSearchParams();
   const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
@@ -53,7 +55,7 @@ const TransaksiScreen = () => {
 
   useEffect(() => {
     getOrderByUser();
-  }, []);
+  }, [refresh]);
 
   if (loading) {
     return (
@@ -68,15 +70,40 @@ const TransaksiScreen = () => {
   // console.log("screen order : ", data);
   return (
     <>
-      <View style={styles.title}>
-        {state?.userInfo?.user?.tipe_user === "User" ? (
-          <Text style={styles.textTitle}>
-            Riwayat Order Anda : ({data?.length})
-          </Text>
-        ) : (
-          <Text style={styles.textTitle}>Order Masuk : ({data?.length})</Text>
-        )}
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: "white",
+          flexDirection: "row",
+          paddingHorizontal: 10,
+        }}
+      >
+        <View style={styles.title}>
+          {state?.userInfo?.user?.tipe_user === "User" ? (
+            <Text style={styles.textTitle}>
+              Riwayat Order Anda : ({data?.length})
+            </Text>
+          ) : (
+            <Text style={styles.textTitle}>Order Masuk : ({data?.length})</Text>
+          )}
+        </View>
+        <TouchableOpacity
+          onPress={() => setRefresh(!refresh)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <MaterialIcon
+            name="refresh"
+            style={{ fontSize: 16, color: "black" }}
+          />
+          <Text>Refresh </Text>
+        </TouchableOpacity>
       </View>
+
       <ScrollView>
         <View style={styles.container}>
           {data?.map((item, index) => (
@@ -144,6 +171,36 @@ const TransaksiScreen = () => {
                   >
                     {item?.status}
                   </Text>
+                  {item?.status === "Selesai" ? (
+                    state?.userInfo?.user?.tipe_user === "User" ? (
+                      <TouchableOpacity
+                        onPress={() =>
+                          router.push(
+                            "/Ulasan/?bengkel_id=" +
+                              item?.bengkel_id +
+                              "&user_id=" +
+                              item?.user_id
+                          )
+                        }
+                      >
+                        <Text
+                          style={{
+                            paddingVertical: 4,
+                            paddingHorizontal: 6,
+                            borderRadius: 50,
+                            color: "green",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Beri Rating
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      ""
+                    )
+                  ) : (
+                    ""
+                  )}
                 </View>
               </View>
             </TouchableOpacity>

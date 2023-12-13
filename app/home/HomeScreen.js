@@ -35,8 +35,17 @@ const HomeScreen = () => {
   const router = useRouter();
   const token = useToken();
 
+  // const logout = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('userInfo');
+  //     // Data berhasil dihapus
+  //   } catch (error) {
+  //     // Terjadi kesalahan saat menghapus data
+  //     console.error('Error:', error);
+  //   }
+  // };
+  console.log("token", state?.userInfo?.token);
   const getDataBengkel = async () => {
-    // console.log("token", token);
     setLoading(true);
     try {
       const response = await fetch(`${baseUrl}/bengkel`, {
@@ -46,6 +55,7 @@ const HomeScreen = () => {
           Authorization: "Bearer " + state?.userInfo?.token,
         },
       });
+      console.log("Res => ", response);
       const result = await response.json();
       // console.log("Bengkel =", result.data);
       setData(result.data);

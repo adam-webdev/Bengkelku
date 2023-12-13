@@ -24,7 +24,7 @@ import Chatbot from "@expo/vector-icons/FontAwesome5";
 import Whatsapp from "@expo/vector-icons/FontAwesome";
 import { showAlert } from "./components/Alert";
 import Loader from "./components/Loader";
-
+import { AirbnbRating } from "@rneui/themed";
 const DetailBengkel = ({ navigation }) => {
   const { id } = useSearchParams();
   const [data, setData] = useState([]);
@@ -54,6 +54,7 @@ const DetailBengkel = ({ navigation }) => {
   useEffect(() => {
     getDetailBengkel();
   }, []);
+  console.log("provins", provinsi);
   // console.log(state.userLocation);
   const dataOrder = {
     user_id: state.userInfo.user.id,
@@ -185,8 +186,61 @@ const DetailBengkel = ({ navigation }) => {
               { paddingVertical: 20, paddingHorizontal: 10 },
             ]}
           >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {data?.nama_bengkel}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {data?.nama_bengkel}
+              </Text>
+              <View style={{ marginBottom: 0 }}>
+                <Text>Rating </Text>
+                <AirbnbRating
+                  style={styles.rating}
+                  showRating={false}
+                  isDisabled={true}
+                  defaultRating={data?.rating}
+                  size={18}
+                  fractions={5}
+                  // onFinishRating={finishRating}
+                  // startingValue={1}
+                />
+                {data?.rating > 0 ? (
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push("/DetailUlasan/?bengkel_id=" + id)
+                    }
+                    style={{ marginTop: 6 }}
+                  >
+                    <Text
+                      style={{
+                        backgroundColor: "green",
+                        paddingHorizontal: 8,
+                        textAlign: "center",
+                        color: "white",
+                        fontWeight: "bold",
+                        paddingVertical: 4,
+                      }}
+                    >
+                      Lihat Ulasan ({data?.ulasan > 10 ? "10+" : data?.ulasan})
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text>Belum Ada Penilaian</Text>
+                )}
+              </View>
+            </View>
+            <Text
+              style={{
+                fontSize: 16,
+                marginTop: 10,
+                marginBottom: 5,
+                fontWeight: "bold",
+              }}
+            >
+              Deskripsi :
             </Text>
             <Text style={{ fontSize: 16 }}>{data?.deskripsi ?? "-"}</Text>
             {/* <Text>
@@ -253,7 +307,7 @@ const DetailBengkel = ({ navigation }) => {
               />
               <Text style={styles.itemText}>
                 {" "}
-                {kota.name}, {provinsi.name}
+                {kota?.name}, {provinsi?.name}
               </Text>
             </View>
             <TouchableOpacity

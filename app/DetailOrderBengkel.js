@@ -133,11 +133,11 @@ const DetailOrderBengkel = () => {
       return;
     }
 
-    console.log("tracking screen start", curlocation);
     let curlocation = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Highest,
       maximumAge: 10000,
     });
+    console.log("tracking screen start", curlocation);
 
     if (intervalRef.current) {
       updateStateLok({
@@ -290,12 +290,20 @@ const DetailOrderBengkel = () => {
     const endCoords = `${lokasiUser[0]},${lokasiUser[1]}`;
     console.log("start :", startCoords);
     // console.log("coord :", coords);
-    // console.log("end :", endCoords);
-    const geometries = "geojson";
-    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${startCoords};${endCoords}?alternatives=true&geometries=${geometries}&steps=true&banner_instructions=true&overview=full&voice_instructions=true&access_token=${APIKEY}`;
-
+    console.log("end :", endCoords);
     try {
-      let response = await fetch(url);
+      const geometries = "geojson";
+      // const urlRute = `https://api.mapbox.com/directions/v5/mapbox/walking/112.7520867,-7.2574717;112.7150083,-7.452235?alternatives=true&geometries=geojson&steps=true&banner_instructions=true&overview=full&voice_instructions=true&access_token=pk.eyJ1IjoiYWNlbmdycGgiLCJhIjoiY2xqbWw5dHBtMTA0dDN0cGJtNGZmMzJidiJ9.Fue2Wxs6TUoFjyBMXgK8Wg`;
+      const urlRute = `https://api.mapbox.com/directions/v5/mapbox/walking/${startCoords};${endCoords}?alternatives=true&geometries=${geometries}&steps=true&banner_instructions=true&overview=full&voice_instructions=true&access_token=${APIKEY}`;
+
+      console.log("mulaai cek route");
+      let response = await fetch(urlRute, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("selesaai cek route", response);
       let json = await response.json();
       console.log("result mapbox:", json);
       const dataResult = json.routes.map((dataResult) => {
@@ -320,7 +328,7 @@ const DetailOrderBengkel = () => {
       setLoading(false);
     } catch (e) {
       setLoading(false);
-      console.log(e);
+      console.log("error", e);
     }
   };
 
